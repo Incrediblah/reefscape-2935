@@ -15,17 +15,19 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import frc.robot.Constants.ArmMotorConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ArmCmd;
-import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.Constants.ArmSubsystemConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.subsystems.ArmSubsystem.Setpoint;
+
 import java.util.List;
 
 /*
@@ -38,12 +40,14 @@ public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem arm = new ArmSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem ();
   
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final JoystickButton PRIMARY_BUTTON_A = new JoystickButton(m_driverController,OIConstants.BUTTON_A_PORT);
   private final JoystickButton PRIMARY_BUTTON_X = new JoystickButton(m_driverController,OIConstants.BUTTON_X_PORT);
   private final JoystickButton PRIMARY_BUTTON_B= new JoystickButton(m_driverController,OIConstants.BUTTON_B_PORT);
+  private final JoystickButton PRIMARY_BUTTON_Y= new JoystickButton(m_driverController,OIConstants.BUTTON_Y_PORT);
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,9 +84,24 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-            PRIMARY_BUTTON_A.onTrue (  new ArmCmd(arm, 90));
+
+            PRIMARY_BUTTON_A.onTrue (arm.setSetpointCommand(Setpoint.climbout));    
+            PRIMARY_BUTTON_X.onTrue (arm.setSetpointCommand(Setpoint.climbin)); 
+            
+            
+
+            
+            PRIMARY_BUTTON_B.onTrue (intake.fowardIntakeCommand());    
+            PRIMARY_BUTTON_B.onFalse(intake.noIntakeCommand());    
+            PRIMARY_BUTTON_Y.onTrue (intake.reverseIntakeCommand());    
+            PRIMARY_BUTTON_Y.onFalse (intake.noIntakeCommand());    
+            
+
+           
           
   }
+
+  
 
 
 

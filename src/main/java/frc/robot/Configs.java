@@ -53,4 +53,64 @@ public final class Configs {
                     .positionWrappingInputRange(0, turningFactor);
         }
     }
+    public static final class ArmSubsystem{
+
+        public static final SparkMaxConfig Arm_M1Config = new SparkMaxConfig();
+
+        static {
+                // Configure basic settings of the arm motor
+                Arm_M1Config.idleMode(IdleMode.kCoast).smartCurrentLimit(40).voltageCompensation(12);
+          
+                /*
+                 * Configure the closed loop controller. We want to make sure we set the
+                 * feedback sensor as the primary encoder.
+                 */
+                Arm_M1Config
+                    .closedLoop
+                    .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                    // Set PID values for position control
+                    .p(0.1)
+                    .outputRange(-1, 1)
+                    .maxMotion
+                    // Set MAXMotion parameters for position control
+                    .maxVelocity(2000)
+                    .maxAcceleration(10000)
+                    .allowedClosedLoopError(0.25);
+
+
+
+                   
+
+                      // Configure basic settings of the arm motor
+           
+          
+                /*
+                 * Configure the closed loop controller. We want to make sure we set the
+                 * feedback sensor as the primary encoder.
+                 */
+        
+
+
+    }
+    
+
+   
+}
+
+public static final class IntakeSubsystem{
+
+        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+static {
+        intakeConfig.inverted(true).idleMode(IdleMode.kBrake).smartCurrentLimit(40);
+
+
+}
+
+
+
+}
+
+
+
 }

@@ -87,6 +87,7 @@ public final class Constants {
     public static final int BUTTON_A_PORT = 1;
     public static final int BUTTON_X_PORT = 3;
     public static final int BUTTON_B_PORT = 2;
+    public static final int BUTTON_Y_PORT = 4;
   }
 
   public static final class AutoConstants {
@@ -108,40 +109,33 @@ public final class Constants {
     public static final double kFreeSpeedRpm = 5676;
   }
 
-public static final class ArmMotorConstants{
+public static final class ArmSubsystemConstants{
   
-   public static final int kArmMotor1CANID = 9;
-   public static final int kArmMotor2CANID = 10;
-
-   public static final int kNeoRPM = 5676;
-
-   public static final double gearRatio = 108;
+   public static final int kArmMotor1CANID = 10 ;
    
+   public static final class Arm1Setpoints {
+    public static final double climbin = -35;
+    public static final double climbout = 50;
+    }
+  
 
-   public static double arm1KP = 6e-5; 
-   public static double arm1KI = 0.0000; 
-   public static double arm1KD = 0; 
-   public static double arm1KIz = 6e-5; 
-   public static double arm1KFf = 0.000015;
+  }
 
-   public static double arm1Max = 1; 
-   public static double arm1Min = -1; 
 
-   public static double arm1SlewRate = 2; 
-   public static double arm1RampRate = 0.25;
+  public static final class IntakeSubsystemConstants{
 
-   public static double arm2KP = 6e-5; 
-   public static double arm2KI = 0.0000; 
-   public static double arm2KD = 0; 
-   public static double arm2KIz = 6e-5; 
-   public static double arm2KFf = 0.000015;
+    public static final int kIntakeMotorCanId = 50; 
 
-   public static double arm2Max = 1; 
-   public static double arm2Min = -1; 
 
-   public static double arm2SlewRate = 2; 
-   public static double arm2RampRate = 0.25;
+    public static final class IntakeSpeeds {
+      public static final double kForward = 0.1;
+      public static final double kReverse = -0.1;
+      public static final double kZero = 0;
+    }
+
 
 
   }
+
+  
 }
