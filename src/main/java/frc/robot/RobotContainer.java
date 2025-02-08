@@ -15,17 +15,21 @@ import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.PS4Controller.Button;
-import frc.robot.Constants.ArmMotorConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ArmCmd;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.SetElevator;
+import frc.robot.subsystems.PivotSubsystem;
+import frc.robot.subsystems.PivotSubsystem.SetPivot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+
 import java.util.List;
 
 /*
@@ -37,13 +41,19 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ArmSubsystem arm = new ArmSubsystem();
+  private final IntakeSubsystem intake = new IntakeSubsystem ();
+  private final ElevatorSubsystem elevator = new ElevatorSubsystem();
+  private final PivotSubsystem pivot = new PivotSubsystem();
+ 
   
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final JoystickButton PRIMARY_BUTTON_A = new JoystickButton(m_driverController,OIConstants.BUTTON_A_PORT);
   private final JoystickButton PRIMARY_BUTTON_X = new JoystickButton(m_driverController,OIConstants.BUTTON_X_PORT);
   private final JoystickButton PRIMARY_BUTTON_B= new JoystickButton(m_driverController,OIConstants.BUTTON_B_PORT);
+  private final JoystickButton PRIMARY_BUTTON_RB= new JoystickButton(m_driverController,OIConstants.BUTTON_RB_PORT);
+  private final JoystickButton PRIMARY_BUTTON_LB= new JoystickButton(m_driverController,OIConstants.BUTTON_LB_PORT);
+  private final JoystickButton PRIMARY_BUTTON_Y= new JoystickButton(m_driverController,OIConstants.BUTTON_Y_PORT);
   
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -80,9 +90,28 @@ public class RobotContainer {
             () -> m_robotDrive.setX(),
             m_robotDrive));
 
-            PRIMARY_BUTTON_A.onTrue (  new ArmCmd(arm, 90));
+
+           
+
+            //intake controls
+            PRIMARY_BUTTON_RB.onTrue (intake.IntakeCommand());    
+            PRIMARY_BUTTON_RB.onFalse(intake.noIntakeCommand());    
+            PRIMARY_BUTTON_LB.onTrue (intake.OutakeCommand());    
+            PRIMARY_BUTTON_Y.onFalse (intake.noIntakeCommand()); 
+            
+          //elevator controls
+             PRIMARY_BUTTON_A.onTrue (elevator.setElevatorCommand(SetElevator.Level1));      
+             PRIMARY_BUTTON_X.onTrue (elevator.setElevatorCommand(SetElevator.Home)); 
+             
+          //pivot controls
+          PRIMARY_BUTTON_B.onTrue (pivot.setPivotCommand(SetPivot.Level1));      
+          PRIMARY_BUTTON_Y.onTrue (pivot.setPivotCommand(SetPivot.Home)); 
+
+           
           
   }
+
+  
 
 
 

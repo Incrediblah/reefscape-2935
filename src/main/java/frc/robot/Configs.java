@@ -51,6 +51,69 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
-        }
-    }
+        }}
+   
+
+public static final class IntakeSubsystem{
+
+        public static final SparkMaxConfig intakeConfig = new SparkMaxConfig();
+
+        static {
+        intakeConfig.inverted(true).idleMode(IdleMode.kBrake).smartCurrentLimit(40);
+}}
+
+public static final class ElevatorSubsystem{
+
+       public static final SparkMaxConfig M1_elevatorConfig = new SparkMaxConfig();
+       public static final SparkMaxConfig M2_elevatorConfig = new SparkMaxConfig();
+
+       static {
+         // Configure basic settings of the arm motor
+         M1_elevatorConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(40).voltageCompensation(12);     
+         M1_elevatorConfig.closedLoop
+          .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+          // Set PID values for position control
+          .p(0.1)
+          .outputRange(-1, 1)
+          .maxMotion
+          // Set MAXMotion parameters for position control
+          .maxVelocity(2000)
+          .maxAcceleration(6000)
+          .allowedClosedLoopError(0.5);
+
+//motor 2
+        M2_elevatorConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(40).voltageCompensation(12).inverted(true);
+        M2_elevatorConfig
+                
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        // Set PID values for position control
+        .p(0.1)
+        .outputRange(-1, 1)
+        .maxMotion
+        // Set MAXMotion parameters for position control
+        .maxVelocity(2000)
+        .maxAcceleration(6000)
+        .allowedClosedLoopError(0.5);
+ }}
+
+
+
+ public static final class PivotSubsystem{
+
+        public static final SparkMaxConfig M_pivotConfig = new SparkMaxConfig();
+  
+        static{
+           M_pivotConfig.idleMode(IdleMode.kCoast).smartCurrentLimit(40).voltageCompensation(12);
+           M_pivotConfig.closedLoop
+            .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+            // Set PID values for position control
+            .p(0.1)
+            .outputRange(-1, 1)
+            .maxMotion
+            // Set MAXMotion parameters for position control
+            .maxVelocity(2000)
+            .maxAcceleration(6000)
+            .allowedClosedLoopError(0.5);
+ }}
 }
