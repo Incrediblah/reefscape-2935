@@ -91,11 +91,12 @@ public final class Constants {
     public static final int kElevator1CanId = 50;
     public static final int kElevator2CanId = 51;
 
-    public static final double kFeederStation = 14;
+    public static final double kFeederStation = 14; //14
+    public static final double kTravel = 0;
     public static final double kLevel1 = 0;
-    public static final double kLevel2 = 18;
-    public static final double kLevel3 = 0;
-    public static final double kLevel4 = 91; //84
+    public static final double kLevel2 = 0; //16
+    public static final double kLevel3 = 0; // 8
+    public static final double kLevel4 = 88; //88
     public static final double kHome = 0;
 
   }
@@ -104,11 +105,12 @@ public final class Constants {
 
     public static final int kArmCanId = 55;
 
-    public static final double kFeederStation = -7;
+    public static final double kFeederStation = -4; // -4
+    public static final double kTravel = 98;
     public static final double kLevel1 = 0;
     public static final double kLevel2 = 0; //-7
-    public static final double kLevel3 = 90;
-    public static final double kLevel4 = 82; //80
+    public static final double kLevel3 = 92;
+    public static final double kLevel4 = 86; //84
     public static final double kHome = 0; //-10
 
   }
@@ -118,6 +120,7 @@ public final class Constants {
     public static final int kCoralIntakeCanId = 60;
 
     public static final double kCoralIntakeSpeed = 0.25;
+    public static final double kCoralOutakeSpeed = -0.75;
 
   }
 

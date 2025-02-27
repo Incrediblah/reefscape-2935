@@ -23,7 +23,9 @@ import java.util.Map;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
@@ -99,38 +101,44 @@ public class RobotContainer {
     );
 
     m_driverController.rightBumper().whileTrue(
-    new CoralIntakeCmd(s_CoralIntakeSubsystem, -(0.75))
+    new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralOutakeSpeed)
     );
 
     m_driverController.rightBumper().whileFalse(
       new CoralIntakeCmd(s_CoralIntakeSubsystem, 0)
     );
 
+    m_driverController.y().onTrue(
+      new InstantCommand(() -> s_driveSubsystem.resetEncoders())
+    );
+
+    // Level 4
+
     m_operatorController.x().onTrue(
 
-      new ParallelCommandGroup(
+      new SequentialCommandGroup(
         new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel4),
-        //new WaitCommand(5),
         new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevel4)
       )
 
     );
 
+    // Feeder Position
+
     m_operatorController.a().onTrue(
 
-      new ParallelCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kFeederStation),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kFeederStation)
+      new SequentialCommandGroup(
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kFeederStation),
+        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kFeederStation)
       )
-      //new homingCmd( s_ElevatorSubsystem, ElevatorConstants.kFeederStation, s_ArmSubsystem, ArmConstants.kFeederStation)
 
     );
 
     m_operatorController.y().onTrue(
 
       new SequentialCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel3)
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel3),
+        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevel3)
       )
 
     );
@@ -138,26 +146,24 @@ public class RobotContainer {
     m_operatorController.b().onTrue(
 
       new SequentialCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevel2),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel2)
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel2),
+        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome)
       )
 
     );
 
     m_operatorController.rightBumper().onTrue(
       new SequentialCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kHome)
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kTravel),
+        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kTravel)
       )
     );
 
-    Trigger intakeOverCurrent = new Trigger(() -> s_CoralIntakeSubsystem.getCoralIntakeCurrentDraw() > 20);
-
-    intakeOverCurrent.onTrue(
+    m_operatorController.leftBumper().onTrue(
       new SequentialCommandGroup(
         new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kHome)
-      )
+          new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kHome)
+        )
     );
 
   }

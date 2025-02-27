@@ -45,6 +45,9 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     return m_CoralIntake.getOutputCurrent();
   }
 
+  public double getCoralIntakeSpeed(){
+    return m_CoralIntakeEncdoer.getVelocity(); 
+  }
 
 
   public void stopCoralIntake() {
@@ -55,5 +58,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Current ", getCoralIntakeCurrentDraw());
+    SmartDashboard.putNumber("intake velocity", getCoralIntakeSpeed()); 
   }
 }

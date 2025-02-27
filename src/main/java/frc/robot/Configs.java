@@ -77,8 +77,8 @@ public class Configs {
                 .p(0.2)
                 .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(4200)
-                .maxAcceleration(6000)
+                .maxVelocity(5000)
+                .maxAcceleration(10000)
                 .allowedClosedLoopError(0.5);
 
             elevator2Config
@@ -93,8 +93,8 @@ public class Configs {
                 .p(0.2)
                 .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(4200)
-                .maxAcceleration(6000)
+                .maxVelocity(5000)
+                .maxAcceleration(10000)
                 .allowedClosedLoopError(0.5);
 
         }
@@ -109,14 +109,14 @@ public class Configs {
 
             armConfig
                 .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(40)
+                .smartCurrentLimit(50)
                 .voltageCompensation(12)
                 .inverted(false);
 
             armConfig
                 .closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .p(0.1)
+                .p(0.12)
                 .outputRange(-1, 1)
                 .maxMotion
                 .maxVelocity(6000)
