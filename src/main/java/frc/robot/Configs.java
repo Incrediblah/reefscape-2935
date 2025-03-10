@@ -1,13 +1,16 @@
 package frc.robot;
 
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkFlexConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import frc.robot.Constants.ModuleConstants;
 
-public final class Configs {
+public class Configs {
+    
     public static final class MAXSwerveModule {
+
         public static final SparkMaxConfig drivingConfig = new SparkMaxConfig();
         public static final SparkMaxConfig turningConfig = new SparkMaxConfig();
 
@@ -52,5 +55,122 @@ public final class Configs {
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
         }
+
     }
+
+    public static final class Climbsubsystem{
+        public static final SparkMaxConfig climbConfig = new SparkMaxConfig();
+        static{
+
+        climbConfig
+        .idleMode(IdleMode.kBrake)
+        .smartCurrentLimit(50)
+        .voltageCompensation(12)
+        .inverted(true);
+
+    climbConfig
+        .closedLoop
+        .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+        .p(0.1)
+        .outputRange(-1, 1)
+        .maxMotion
+        .maxVelocity(6000)
+        .maxAcceleration(4000)
+        .allowedClosedLoopError(1);
+
+
+     }}
+
+    public static final class ElevatorSubsystem {
+
+        public static final SparkMaxConfig elevator1Config = new SparkMaxConfig();
+        public static final SparkMaxConfig elevator2Config = new SparkMaxConfig();
+
+        static {
+
+            elevator1Config
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50)
+                .voltageCompensation(12)
+                .inverted(true);
+
+            elevator1Config
+                .closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(0.1)
+                .outputRange(-1, 1)
+                .maxMotion
+                .maxVelocity(8000)
+                .maxAcceleration(7000)
+                .allowedClosedLoopError(0.5);
+
+            elevator2Config
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50)
+                .voltageCompensation(12)
+                .inverted(false);
+
+            elevator2Config
+                .closedLoop
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
+                .p(0.1)
+                .outputRange(-1, 1)
+                .maxMotion
+                .maxVelocity(8000)
+                .maxAcceleration(7000)
+                .allowedClosedLoopError(0.5);
+
+        }
+
+    }
+
+    public static final class ArmSubsystem {
+
+        public static final SparkMaxConfig armConfig = new SparkMaxConfig();
+
+        static {
+
+            // Arm Configs velocity and acceleration are based in radians, ask Ajay before changins one of these values
+            double armFactor = 2 * Math.PI;
+
+            armConfig
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(50)
+                .voltageCompensation(12);
+
+            armConfig.absoluteEncoder
+                .inverted(true)
+                .positionConversionFactor(armFactor);
+
+            armConfig.closedLoop
+                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .p(1)
+                .outputRange(-1, 1)
+                .positionWrappingEnabled(true)
+                .positionWrappingInputRange(0, armFactor)
+                .maxMotion
+                .maxVelocity(4)
+                .maxAcceleration(8)
+                .allowedClosedLoopError(0.1);
+
+        }
+
+    }
+
+    public static final class CoralIntakeSubsystem {
+
+        public static final SparkMaxConfig coralIntakeConfig = new SparkMaxConfig();
+
+        static {
+
+            coralIntakeConfig
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(40)
+                .voltageCompensation(12)
+                .inverted(true);
+
+        }
+
+    }
+
 }
