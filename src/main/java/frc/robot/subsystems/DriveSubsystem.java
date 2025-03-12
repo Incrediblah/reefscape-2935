@@ -4,9 +4,6 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.hal.FRCNetComm.tInstances;
-import edu.wpi.first.hal.FRCNetComm.tResourceType;
-import edu.wpi.first.hal.HAL;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -14,8 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-//import edu.wpi.first.wpilibj.ADIS16470_IMU;
-//import edu.wpi.first.wpilibj.ADIS16470_IMU.IMUAxis;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants.DriveConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import com.studica.frc.AHRS;
@@ -47,6 +43,8 @@ public class DriveSubsystem extends SubsystemBase {
  // private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
  private final AHRS m_gyro = new AHRS(NavXComType.kMXP_SPI);
 
+ private double gyroOffset = 0.0; 
+
   // Odometry class for tracking robot pose
   SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -74,6 +72,13 @@ public class DriveSubsystem extends SubsystemBase {
             m_rearLeft.getPosition(),
             m_rearRight.getPosition()
         });
+
+    SmartDashboard.putNumber("'average distance", getAverageDistance()); 
+    SmartDashboard.putNumber("right distance", m_frontRight.getDrivePosition()); 
+    SmartDashboard.putNumber("left distance", m_frontLeft.getDrivePosition()); 
+    SmartDashboard.putNumber("Robot Heading", getHeading());
+    SmartDashboard.putString("robot location", getPose().getTranslation().toString());
+  
   }
 
   /**
@@ -130,6 +135,25 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearRight.setDesiredState(swerveModuleStates[3]);
   }
 
+  public void slowDrive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // Convert the commanded speeds into the correct units for the drivetrain
+    double xSpeedDelivered = xSpeed * DriveConstants.kSlowSpeedMetersPerSecond;
+    double ySpeedDelivered = ySpeed * DriveConstants.kMaxSpeedMetersPerSecond;
+    double rotDelivered = rot * DriveConstants.kMaxAngularSpeed;
+
+    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
+        fieldRelative
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered,
+                Rotation2d.fromDegrees(getHeading()))
+            : new ChassisSpeeds(xSpeedDelivered, ySpeedDelivered, rotDelivered));
+    SwerveDriveKinematics.desaturateWheelSpeeds(
+        swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
+    m_frontLeft.setDesiredState(swerveModuleStates[0]);
+    m_frontRight.setDesiredState(swerveModuleStates[1]);
+    m_rearLeft.setDesiredState(swerveModuleStates[2]);
+    m_rearRight.setDesiredState(swerveModuleStates[3]);
+  }
+
   /**
    * Sets the wheels into an X formation to prevent movement.
    */
@@ -164,16 +188,23 @@ public class DriveSubsystem extends SubsystemBase {
 
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
-    m_gyro.reset();
-  }
+    m_gyro.reset();  // Reset the gyro
+    gyroOffset = 0.0; // Clear any previous offset
+    adjustGyroToAngle(0); // Adjust gyro to 0 angle
+}
 
   /**
    * Returns the heading of the robot.
    *
    * @return the robot's heading in degrees, from -180 to 180
    */
+  public void adjustGyroToAngle(double expectedAngle){
+    double currentAngle = getHeading(); 
+    gyroOffset = expectedAngle - currentAngle; 
+  }
+
   public double getHeading() {
-    return Math.IEEEremainder(-m_gyro.getAngle(),360);
+    return Math.IEEEremainder(-m_gyro.getAngle() + gyroOffset,360);
   }
 
   /**
@@ -184,6 +215,15 @@ public class DriveSubsystem extends SubsystemBase {
   public double getTurnRate() {
     return getHeading() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
+
+
+  public double getAverageDistance(){
+    // double totalDistance = m_frontLeft.getDrivePosition() + m_frontRight.getDrivePosition() + m_rearLeft.getDrivePosition() + m_rearRight.getDrivePosition(); 
+    double totalDistance = m_rearLeft.getDrivePosition(); 
+
+    return totalDistance; 
+  }
+
   public void stopModules() {
     m_frontLeft.stop();
     m_frontRight.stop();
