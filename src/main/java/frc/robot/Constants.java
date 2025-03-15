@@ -108,9 +108,9 @@ public final class Constants {
 
     public static final int kArmCanId = 55;
 
-    public static final double kHome = 0.3; //-10
+    public static final double kHome = 0.9; //-10
     public static final double kFeederStation = 0.2; // -4
-    public static final double kTravel = 0;
+    public static final double kClimbPosition = 0;
 
     public static final double kLevel1 = 0;
     public static final double kLevel2 = 0; //-7
@@ -124,8 +124,9 @@ public final class Constants {
 
     public static final int kClimbCanId = 57;
 
-    public static final double kHome = 0; 
-    public static final double kclimb= 5;
+    public static final double kclimbOut = 100; 
+    public static final double kclimbIn= 230;
+    public static final double kHome=0;
     
 
 
@@ -137,7 +138,7 @@ public final class Constants {
 
     public static final double kCoralIntakeSpeed = 1;
     public static final double kCoralOutakeSpeed = -1;
-    public static final double kCoralNoSpeed = -0.1;
+    public static final double kCoralNoSpeed = 0.085;
 
 
     public static final int intakeSwitchPort = 0; 
@@ -170,6 +171,8 @@ public final class Constants {
     public static final double rotAlignKp = 0.01; 
     public static final double rotAlignKi = 0;
     public static final double rotAlignKd = 0.001;
+
+    public static final int aprilTagPipeline = 0; 
   }
 
   
@@ -181,7 +184,7 @@ public final class Constants {
 
     public static final double kPXController = 0.25;
     public static final double kPYController = 0.25;
-    public static final double kPThetaController = 1;
+    public static final double kPThetaController = 0.95;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(

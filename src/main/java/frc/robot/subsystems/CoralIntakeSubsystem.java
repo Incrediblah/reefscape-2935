@@ -32,6 +32,7 @@ public class CoralIntakeSubsystem extends SubsystemBase {
       PersistMode.kPersistParameters
     );
 
+    
   }
 
   // This commands sets the output power of the motor between 0 and 1
@@ -62,5 +63,6 @@ public class CoralIntakeSubsystem extends SubsystemBase {
 
     // Print out the current of the intake to the smartdashboard
     SmartDashboard.putNumber("Current ", getCoralIntakeCurrentDraw());
+    SmartDashboard.putBoolean("has piece", getIntakeSwitchValue());  
   }
 }

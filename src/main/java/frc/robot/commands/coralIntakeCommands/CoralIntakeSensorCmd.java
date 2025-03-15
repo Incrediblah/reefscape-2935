@@ -31,20 +31,20 @@ public class CoralIntakeSensorCmd extends Command {
   @Override
   public void execute() {
     // Run the Coral Intake based on power
-    s_CoralIntakeSubsystem.setCoralIntakeSpeed(CoralIntakeConstants.kCoralIntakeSpeed);
+    s_CoralIntakeSubsystem.setCoralIntakeSpeed(0.5 * CoralIntakeConstants.kCoralIntakeSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    s_CoralIntakeSubsystem.setCoralIntakeSpeed(0);
+    s_CoralIntakeSubsystem.setCoralIntakeSpeed(CoralIntakeConstants.kCoralNoSpeed);
  
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(s_CoralIntakeSubsystem.getIntakeSwitchValue()){
+    if(!s_CoralIntakeSubsystem.getIntakeSwitchValue()){
       return true; 
     }else{
       return false; 

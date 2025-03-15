@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.pathConstants;
 import frc.robot.commands.autoBlocks.autoAlignmentToReef;
-import frc.robot.commands.autoBlocks.autoAlignmentToSpecificReef;
 import frc.robot.commands.autoBlocks.autoScoreCoral;
+import frc.robot.commands.autoBlocks.autoScoreSpecificCoral;
 import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.driveCommands.OdometryCmd;
 import frc.robot.commands.driveCommands.TurnToAngleCommand;
@@ -26,9 +26,9 @@ import frc.robot.subsystems.VisionSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class onePieceRobotRight extends SequentialCommandGroup {
+public class onePieceAuto extends SequentialCommandGroup {
   /** Creates a new onePieceRobotRight. */
-  public onePieceRobotRight(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside) {
+  public onePieceAuto(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside, int targetId) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
@@ -36,13 +36,9 @@ public class onePieceRobotRight extends SequentialCommandGroup {
       
       new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
       new InstantCommand(() -> drive.zeroHeading()),
-      new InstantCommand(() -> drive.adjustGyroToAngle(60)), 
+      new InstantCommand(() -> drive.adjustGyroToAngle(vision.getReefAngleForTag(targetId, AutoConstants.autoMode))), 
 
-      // //new autoAlignmentToReef(drive, vision, "right", false, AutoConstants.autoMode)
-      new DriveDistanceCmd(drive, 0.45, 1, false), 
-      new autoScoreCoral(drive, vision, elevator, arm, intake, "right",AutoConstants.autoMode)
-      // new autoAlignmentToReef(drive, vision, reefside,false, AutoConstants.autoMode)
-
+      new autoScoreSpecificCoral(drive, vision, elevator, arm, intake, reefside, targetId)
     );
   }
 }

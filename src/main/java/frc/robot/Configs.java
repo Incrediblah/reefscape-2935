@@ -62,26 +62,28 @@ public class Configs {
         public static final SparkMaxConfig climbConfig = new SparkMaxConfig();
         static{
 
-            double climbFactor = 2 * Math.PI;
+            // double climbFactor = 2 * Math.PI;
 
             climbConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .voltageCompensation(12);
+                .voltageCompensation(12)
+                .inverted(false);
 
-            climbConfig.absoluteEncoder
-                .inverted(true)
-                .positionConversionFactor(climbFactor);
+
+            // climbConfig.absoluteEncoder
+            //     .inverted(true)
+            //     .positionConversionFactor(climbFactor);
 
             climbConfig.closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(1)
                 .outputRange(-1, 1)
-                .positionWrappingEnabled(true)
-                .positionWrappingInputRange(0, climbFactor)
+                // .positionWrappingEnabled(true)
+                // .positionWrappingInputRange(0, climbFactor)
                 .maxMotion
-                .maxVelocity(4)
-                .maxAcceleration(8)
+                .maxVelocity(2)
+                .maxAcceleration(5)
                 .allowedClosedLoopError(0.1);
 
 
@@ -173,7 +175,7 @@ public class Configs {
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(40)
                 .voltageCompensation(12)
-                .inverted(false);
+                .inverted(true);
 
         }
 
