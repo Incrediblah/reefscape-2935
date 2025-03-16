@@ -42,6 +42,36 @@ public class PhotonSubsystem extends SubsystemBase {
         return (target != null) ? target.getFiducialId() : -1;
     }
 
+
+    public PhotonTrackedTarget getSpecificTarget(int tagId){
+        
+        PhotonPipelineResult result = camera.getLatestResult(); 
+
+        if(!result.hasTargets()){
+            return null; 
+        }
+
+
+        for(PhotonTrackedTarget target : result.getTargets()){
+            if (target.getFiducialId() == tagId){
+                return target; 
+            }
+        }
+
+        return null; 
+    }
+
+    public double getYawToSpecificTarget(int tagId) {
+        PhotonTrackedTarget target = getSpecificTarget(tagId);
+        return (target != null) ? target.getYaw() : 0.0;
+    }
+
+    public double getPitchToSpecific(int tagId) {
+        PhotonTrackedTarget target = getSpecificTarget(tagId);
+        return (target != null) ? target.getPitch() : 0.0;
+    }
+
+
     public void updateLastSeenAprilTag() {
         int tagID = getBestAprilTagID();
         if (tagID != -1) {

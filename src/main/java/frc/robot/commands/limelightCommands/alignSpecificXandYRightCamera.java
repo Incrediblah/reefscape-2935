@@ -2,13 +2,14 @@ package frc.robot.commands.limelightCommands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command; 
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.MathUtil;
 
-public class alignXandYRightCamera extends Command {
+public class alignSpecificXandYRightCamera extends Command {
 
     private final VisionSubsystem VISION_SUBSYSTEM; 
     private final DriveSubsystem DRIVE_SUBSYSTEM; 
@@ -37,13 +38,16 @@ public class alignXandYRightCamera extends Command {
     private boolean inRangeX; 
     private boolean inRangeY; 
 
+
+    private int target; 
+
     /** Creates a new alignmentCommand. */
-    public alignXandYRightCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
-                                double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
+    public alignSpecificXandYRightCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
+                                double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY, int targetID) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
         this.DRIVE_SUBSYSTEM = drive; 
         this.VISION_SUBSYSTEM = vision; 
 
-         this.drivePID = new PIDController(VisionConstants.driveAlignKp,VisionConstants.driveAlignKi, VisionConstants.driveAlignKd); 
+        this.drivePID = new PIDController(VisionConstants.driveAlignKp,VisionConstants.driveAlignKi, VisionConstants.driveAlignKd); 
         this.strafePID = new PIDController(VisionConstants.strafeAlignKp,VisionConstants.strafeAlignKi, VisionConstants.strafeAlignKd);
         this.rotationPID = new PIDController(VisionConstants.rotAlignKp,VisionConstants.rotAlignKi, VisionConstants.rotAlignKd); // NEW: Controls unintended turning
 
@@ -54,9 +58,12 @@ public class alignXandYRightCamera extends Command {
         this.targetValueY = targetOffsetY;  
 
         this.toleranceX = toleranceX; 
-        this.toleranceY = toleranceY; 
-      
+        this.toleranceY = toleranceY;
+
+        this.target = targetID; 
+  
         addRequirements(DRIVE_SUBSYSTEM, VISION_SUBSYSTEM);
+        
     }
 
     @Override
@@ -69,21 +76,17 @@ public class alignXandYRightCamera extends Command {
         inRangeX = false; 
         inRangeY = false; 
 
-        targetAngle = DRIVE_SUBSYSTEM.getHeading(); 
-
-        VISION_SUBSYSTEM.setLeftPipeline(1);
-        VISION_SUBSYSTEM.setRightPipeline(1);
-
-        VISION_SUBSYSTEM.setLeftLED(1);
-        VISION_SUBSYSTEM.setRightLED(1);
+        targetAngle = DRIVE_SUBSYSTEM.getHeading();
+        
+ 
     }
 
     @Override
     public void execute() {
         if(VISION_SUBSYSTEM.limelightRightTargetSeen()){
-            measuredValueY = VISION_SUBSYSTEM.getRightTy();
-            measuredValueX = VISION_SUBSYSTEM.getRightTx();  
-
+            measuredValueY = VISION_SUBSYSTEM.getRightSpecificTagTy(target);
+            measuredValueX = VISION_SUBSYSTEM.getRightSpecificTagTx(target); 
+            
             // X-direction (Strafing)
             if (Math.abs(targetValueX - measuredValueX) <= toleranceX) { 
                 strafeSpeed = 0; 
@@ -93,6 +96,8 @@ public class alignXandYRightCamera extends Command {
             }
             strafeSpeed = MathUtil.clamp(strafeSpeed, -0.25, 0.25); // Keep existing limits
 
+            
+
             // Y-direction (Forward movement)
             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
                 driveSpeed = 0; 
@@ -100,7 +105,7 @@ public class alignXandYRightCamera extends Command {
             } else {
                 driveSpeed = drivePID.calculate(measuredValueY, targetValueY);
             }
-            driveSpeed = MathUtil.clamp(driveSpeed, -0.15, 0.15); // Keep existing limits
+            driveSpeed = MathUtil.clamp(driveSpeed, -0.35, 0.35); // Keep existing limits
 
             // NEW: Lock robot to the set angle and prevent unnecessary rotation
             double currentHeading = DRIVE_SUBSYSTEM.getHeading();
@@ -113,8 +118,10 @@ public class alignXandYRightCamera extends Command {
             SmartDashboard.putBoolean("In Range X", inRangeX); 
             SmartDashboard.putBoolean("In Range Y", inRangeY);
 
-            // Drive using corrected values, preventing unnecessary rotation
-            DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
+
+
+           DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
+            // DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, 0, false);
 
         } else {
             driveSpeed = 0;
@@ -127,7 +134,7 @@ public class alignXandYRightCamera extends Command {
     public void end(boolean interrupted) {
         DRIVE_SUBSYSTEM.drive(0, 0, 0, false); // Stop all movement
 
-        VISION_SUBSYSTEM.setLeftPipeline(0);
+        VISION_SUBSYSTEM.setRightPipeline(0);
         VISION_SUBSYSTEM.setRightPipeline(0);
 
     }
@@ -143,4 +150,5 @@ public class alignXandYRightCamera extends Command {
         }
     }
 }
+
 
