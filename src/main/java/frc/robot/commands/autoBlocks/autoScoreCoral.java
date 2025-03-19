@@ -4,26 +4,19 @@
 
 package frc.robot.commands.autoBlocks;
 
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.CoralIntakeConstants;
 import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.VisionConstants;
 import frc.robot.commands.MoveElevatorToSetpoint;
 import frc.robot.commands.armCommands.MoveArmToSetpoint;
 import frc.robot.commands.coralIntakeCommands.CoralIntakeCmd;
 import frc.robot.commands.coralIntakeCommands.CoralIntakeForTimeCmd;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
-import frc.robot.commands.limelightCommands.TurnToAprilTagCommand;
-import frc.robot.commands.limelightCommands.alignXLeftCamera;
-import frc.robot.commands.limelightCommands.alignXandYLeftCamera;
-import frc.robot.commands.limelightCommands.alignXandYRightCamera;
+import frc.robot.commands.coralIntakeCommands.CoralOutakeSensorCmd;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -43,19 +36,26 @@ public class autoScoreCoral extends SequentialCommandGroup {
     addCommands(
 
 
-      new ParallelCommandGroup(
-        new SequentialCommandGroup(
-          new MoveArmToSetpoint(arm, ArmConstants.kLevel4), 
-          new MoveElevatorToSetpoint(elevator, ElevatorConstants.kLevel4)
+      new ParallelDeadlineGroup(
+
+        new ParallelCommandGroup(
+          new SequentialCommandGroup(
+            new MoveArmToSetpoint(arm, ArmConstants.kLevel4), 
+            new MoveElevatorToSetpoint(elevator, ElevatorConstants.kLevel4)
+          ), 
+    
+          new SequentialCommandGroup(
+            new autoAlignmentToReef(drive, vision, reefside, false,AutoConstants.autoMode)
+          )
         ), 
-  
-        new SequentialCommandGroup(
-           new autoAlignmentToReef(drive, vision, reefside, false,AutoConstants.autoMode)
-        )
+
+        new CoralIntakeCmd(intake, CoralIntakeConstants.kCoralNoSpeed)
       ), 
 
-      new CoralIntakeForTimeCmd(intake, 1, 500),
-      new DriveForwardDistance(drive, -0.5, 0.4, false)
+
+      // new CoralOutakeSensorCmd(intake), 
+      new CoralIntakeForTimeCmd(intake,CoralIntakeConstants.kCoralOutakeSpeed, 1000),
+      new DriveDistanceCmd(drive, 0.5, -0.5, false, 2000)
 
     );
   }
