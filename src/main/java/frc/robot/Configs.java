@@ -1,10 +1,12 @@
 package frc.robot;
 
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
+import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
-import com.revrobotics.spark.config.SparkFlexConfig;
+//import com.revrobotics.spark.config.SparkFlexConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.ModuleConstants;
 
 public class Configs {
@@ -62,26 +64,28 @@ public class Configs {
         public static final SparkMaxConfig climbConfig = new SparkMaxConfig();
         static{
 
-            double climbFactor = 2 * Math.PI;
+            // double climbFactor = 2 * Math.PI;
 
             climbConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .voltageCompensation(12);
+                .voltageCompensation(12)
+                .inverted(false);
 
-            climbConfig.absoluteEncoder
-                .inverted(true)
-                .positionConversionFactor(climbFactor);
+
+            // climbConfig.absoluteEncoder
+            //     .inverted(true)
+            //     .positionConversionFactor(climbFactor);
 
             climbConfig.closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .p(1)
                 .outputRange(-1, 1)
-                .positionWrappingEnabled(true)
-                .positionWrappingInputRange(0, climbFactor)
+                // .positionWrappingEnabled(true)
+                // .positionWrappingInputRange(0, climbFactor)
                 .maxMotion
-                .maxVelocity(4)
-                .maxAcceleration(8)
+                .maxVelocity(0.5)//1
+                .maxAcceleration(4)//5
                 .allowedClosedLoopError(0.1);
 
 
@@ -106,8 +110,8 @@ public class Configs {
                 .p(0.1)
                 .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(10000)
-                .maxAcceleration(8500)
+                .maxVelocity(20000)
+                .maxAcceleration(8000)
                 .allowedClosedLoopError(0.5);
 
             elevator2Config
@@ -122,8 +126,8 @@ public class Configs {
                 .p(0.1)
                 .outputRange(-1, 1)
                 .maxMotion
-                .maxVelocity(10000)
-                .maxAcceleration(8500)
+                .maxVelocity(20000)
+                .maxAcceleration(8000)
                 .allowedClosedLoopError(0.5);
 
         }
@@ -150,14 +154,17 @@ public class Configs {
 
             armConfig.closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                .p(1)
+                .p(0.03)//0.5
+                .i(0.000001)  //0.00009
+                .d(0.0000000)
                 .outputRange(-1, 1)
                 .positionWrappingEnabled(true)
-                .positionWrappingInputRange(0, armFactor)
+                .positionWrappingInputRange(-armFactor, armFactor)
                 .maxMotion
-                .maxVelocity(6)
-                .maxAcceleration(9)
+                .maxVelocity(20000)
+                .maxAcceleration(30003)
                 .allowedClosedLoopError(0.1);
+                
 
         }
 
@@ -173,7 +180,7 @@ public class Configs {
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(40)
                 .voltageCompensation(12)
-                .inverted(false);
+                .inverted(true);
 
         }
 

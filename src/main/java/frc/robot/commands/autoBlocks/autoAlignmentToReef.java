@@ -7,7 +7,7 @@ package frc.robot.commands.autoBlocks;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.limelightCommands.TurnToAprilTagCommand;
 import frc.robot.commands.limelightCommands.alignXandYLeftCamera;
 import frc.robot.commands.limelightCommands.alignXandYRightCamera;
@@ -37,7 +37,7 @@ public class autoAlignmentToReef extends SequentialCommandGroup {
     addCommands(
       new TurnToAprilTagCommand(drive, vision, false, mode), 
       visionCommand,
-      new DriveForwardDistance(drive, 0.15, 0.4, false)
+      new DriveDistanceCmd(drive, 0.15, 0.45, false, 2000)
     );
 
     drive.adjustGyroToAngle(vision.getReefAngleForTag(vision.getBestAprilTag(),mode)); 

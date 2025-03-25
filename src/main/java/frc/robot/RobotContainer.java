@@ -6,21 +6,27 @@ package frc.robot;
 
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.CoralSystemContants;
 import frc.robot.Constants.DriverControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorControllerConstants;
+import frc.robot.Constants.StatusVariables;
+import frc.robot.commands.MoveClimbManually;
+import frc.robot.commands.MoveClimbToSetpoint;
 import frc.robot.commands.MoveElevatorToSetpoint;
+import frc.robot.commands.moveCoralSystemToPosition;
 import frc.robot.commands.armCommands.MoveArmToSetpoint;
 import frc.robot.commands.auto.onePieceAutos.onePieceRobotCentre;
+import frc.robot.commands.auto.onePieceAutos.onePieceRobotLeft;
 import frc.robot.commands.auto.onePieceAutos.onePieceRobotRight;
+import frc.robot.commands.auto.twoPieceAutos.twoPieceRobotLeft;
 import frc.robot.commands.auto.twoPieceAutos.twoPieceRobotRight;
-// import frc.robot.commands.auto.twoPieceAutos.twoPieceRobotRight;
-import frc.robot.commands.autoBlocks.autoAlignmentToFeeder;
-import frc.robot.commands.autoBlocks.autoAlignmentToReef;
+import frc.robot.commands.autoBlocks.autoScoreCoral;
 import frc.robot.commands.coralIntakeCommands.CoralIntakeCmd;
-import frc.robot.commands.limelightCommands.alignXandYRightCamera;
-import frc.robot.commands.photonCommands.AlignXandYWithPhoton;
+import frc.robot.commands.coralIntakeCommands.CoralIntakeForTimeCmd;
+import frc.robot.commands.coralIntakeCommands.CoralIntakeSensorCmd;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
@@ -29,14 +35,14 @@ import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-import java.time.Instant;
+
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -60,13 +66,15 @@ public class RobotContainer {
   private final PhotonSubsystem photon = new PhotonSubsystem();
 
   //Autos
-  private final Command onePieceCentre= new onePieceRobotCentre(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
-  private final Command onePieceRobotRight = new onePieceRobotRight(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
-  // private final Command onePieceRobotLeft = new onePieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
-  private final Command twoPieceRobotRight = new twoPieceRobotRight(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
-  // private final Command twoPieceRobotLeft = new twoPieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
+  private final Command onePieceCentre=new onePieceRobotCentre(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
+  private final Command onePieceRight = new onePieceRobotRight(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
+  private final Command onePieceLeft = new onePieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right");
+  private final Command twoPieceLeft = new twoPieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem);
+  private final Command twoPieceRight = new twoPieceRobotRight(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem);
+  SendableChooser<Command> m_autoChooser = new SendableChooser<>(); 
 
-   SendableChooser<Command> m_autoChooser = new SendableChooser<>(); 
+
+
   // Setup Driver Controller
   private final CommandXboxController m_driverController =
       new CommandXboxController(DriverControllerConstants.kDriverControllerPort);
@@ -78,11 +86,14 @@ public class RobotContainer {
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
 
-    m_autoChooser.setDefaultOption("onePieceCentre", onePieceCentre);
-    m_autoChooser.addOption("onePieceRobotRight", onePieceRobotRight);
-    // m_autoChooser.addOption("onePieceRobotLeft", onePieceRobotLeft);
-    m_autoChooser.addOption("twoPieceRobotRight", twoPieceRobotRight);
-    // m_autoChooser.addOption("twoPieceRobotLeft", twoPieceRobotLeft);
+   // m_autoChooser.setDefaultOption("BLUE-ONE-CENTRE", onePieceCentreBlue);
+    m_autoChooser.setDefaultOption("ONE-PIECE-CENTRE", onePieceCentre);
+    m_autoChooser.addOption("ONE-PIECE-CENTRE", onePieceCentre);
+    m_autoChooser.addOption("ONE-PIECE-RIGHT", onePieceRight);
+    m_autoChooser.addOption("ONE-PIECE-LEFT", onePieceLeft);
+    m_autoChooser.addOption("TWO-PIECE-RIGHT", twoPieceRight);
+    m_autoChooser.addOption("TWO-PIECE-LEFT", twoPieceLeft);
+  
     Shuffleboard.getTab("Autonomous").add(m_autoChooser); 
 
 
@@ -90,6 +101,8 @@ public class RobotContainer {
 
     // Configure the trigger bindings
     configureBindings();
+
+    defaultCommands(); 
 
     s_driveSubsystem.setDefaultCommand(
         // The left stick controls translation of the robot.
@@ -101,6 +114,8 @@ public class RobotContainer {
                 -MathUtil.applyDeadband(m_driverController.getRightX(), DriverControllerConstants.kDriveDeadband),
                 true),
             s_driveSubsystem));
+
+     
   }
 
   /**
@@ -112,166 +127,155 @@ public class RobotContainer {
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
    */
+
+  private void defaultCommands(){
+    SmartDashboard.putNumber("Current Coral", Globals.currentPos);
+  }
+
   private void configureBindings() {
-   
+    
     //________________________________________DRIVER BUTTONS____________________________________________________________//
 
     // INTAKE
-    m_driverController.leftBumper().whileTrue(
-      new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralIntakeSpeed)
+    m_driverController.leftBumper().onTrue(
+      // new CoralIntakeSensorCmd(s_CoralIntakeSubsystem)
+     new CoralIntakeCmd(s_CoralIntakeSubsystem, 0.5*CoralIntakeConstants.kCoralIntakeSpeed)
     );
 
-    m_driverController.leftBumper().whileFalse(
+    m_driverController.leftBumper().onFalse(
       new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralNoSpeed)
     );
 
     // OUTAKE
-    m_driverController.rightBumper().whileTrue(
+    m_driverController.rightBumper().onTrue(
     new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralOutakeSpeed)
     );
 
-    m_driverController.rightBumper().whileFalse(
+    m_driverController.rightBumper().onFalse(
       new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralNoSpeed)
     );
 
-    //_______________________________________OPERATOR BUTTONS___________________________________________________________//
+    m_driverController.rightTrigger().onTrue(
+      new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralSlowOutakeSpeed)
+      );
+
+      m_driverController.rightTrigger().onFalse(
+        new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralNoSpeed)
+        );
+
+        // m_driverController.x().onTrue( new CoralIntakeForTimeCmd(s_CoralIntakeSubsystem,CoralIntakeConstants.kCoralAutoOutake , 1000));
+        // m_driverController.x().onFalse( new CoralIntakeCmd(s_CoralIntakeSubsystem, CoralIntakeConstants.kCoralNoSpeed));
+  
 
 
-    // GO TO HOME POSITION
+     // RESET BUTTONS 
+    m_driverController.povUp().onTrue(
+      new InstantCommand(() -> s_driveSubsystem.zeroHeading())
+      );
 
+      // m_driverController.x().onTrue(
+      //    new autoScoreCoral(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "left", AutoConstants.autoMode)
+      //    );
 
-
-
-    // GO TO FEEDER POSITION
-
-
-
-
-    // GO TO TRAVEL POSITION
-
-
-
-
-    // GO TO LEVEL 1
-
-
-
-
-    // GO TO LEVEL 2
-
-
-
-
-    // GO TO LEVEL 3
-
-
-
-
-    // GO TO LEVEL 4
-
-
-    m_operatorController.x().onTrue(
-
-      new SequentialCommandGroup(
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel4),
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevel4)
-      )
-
-    );
-
-    // Feeder Position
-
-    m_operatorController.a().onTrue(
-
-      new SequentialCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kFeederStation),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kFeederStation)
-      )
-
-    );
-
-    m_operatorController.y().onTrue(
-
-      new SequentialCommandGroup(
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel3),
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevel3)
-      )
-
-    );
-
-    m_operatorController.b().onTrue(
-
-      new SequentialCommandGroup(
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel2),
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome)
-      )
-
-    );
-
-    m_operatorController.leftBumper().onTrue(
-      new SequentialCommandGroup(
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kTravel),
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kTravel)
-      )
-    );
-
-    m_operatorController.rightBumper().onTrue(
-      new SequentialCommandGroup(
-        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kHome),
-        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kHome)
-        )
-    );
+      
 
    
 
 
-    // autonomous alignment commands right camera
+    //_______________________________________OPERATOR BUTTONS___________________________________________________________//
 
-    m_driverController.b().onTrue(
-
-      new autoAlignmentToReef(s_driveSubsystem, s_VisionSubsystem, "right",false, AutoConstants.teleMode)
-      // new autoScoreCoral(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right")
-      // new CoralIntakeForTimeCmd(s_CoralIntakeSubsystem, -CoralIntakeConstants.kCoralOutakeSpeed, 2000)
+    // GO TO LEVEL 4
+    //GO TO HOME
+    m_operatorController.rightBumper().onTrue(
+      new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.HOME)
     ); 
 
-    m_driverController.b().onFalse(
-      new ParallelDeadlineGroup(
-        new alignXandYRightCamera(s_driveSubsystem, s_VisionSubsystem, 0, true, 18, 1.15, 0.5, 0.5) 
+    m_operatorController.b().onTrue(
+      new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.FEEDER)
+    ); 
+
+    // m_operatorController.x().onTrue(
+    //   new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.L1)
+    // ); 
+
+    m_operatorController.a().onTrue(
+      new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.L2)
+    ); 
+
+
+    m_operatorController.x().onTrue(
+      new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.L3)
+    ); 
+
+    m_operatorController.y().onTrue(
+      new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.L4)
+    ); 
+
+    // m_operatorController.povRight().onTrue(
+    //   new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, "CLIMB")
+    // ); 
+
+
+
+    //GO TO CLIMB IN
+    m_operatorController.leftBumper().onTrue(
+      new SequentialCommandGroup(
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kHome),
+        new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevelClimb),
+       new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kLevel3),
+       new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kClimbHigh),
+      // new moveCoralSystemToPosition(s_ArmSubsystem, s_ElevatorSubsystem, CoralSystemContants.CLIMB),
+       new MoveClimbToSetpoint(climb, ClimbConstants.kclimbOut)
+
+      //  new MoveElevatorToSetpoint(s_ElevatorSubsystem, ElevatorConstants.kLevelClimb)
+      )
+    );
+
+    //GO TO CLIMB OUT
+    m_operatorController.leftTrigger().onTrue(
+      new SequentialCommandGroup(
+        new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kClimbHigh),
+        new MoveClimbToSetpoint(climb, ClimbConstants.kclimbUp)
+
+      
       )
     ); 
 
+    //GO TO CLIMB OUT again
+    m_operatorController.rightTrigger().onTrue(
+      new SequentialCommandGroup(
+         new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kClimbHigh),
+       new MoveClimbToSetpoint(climb, ClimbConstants.kclimbOut)
+      
 
-    // autonomous alignment commands left camera
-
-    m_driverController.a().onTrue(
-      new autoAlignmentToReef(s_driveSubsystem, s_VisionSubsystem, "left",false, AutoConstants.teleMode)
+      )
     ); 
 
-    m_driverController.a().onFalse(
+   //HOME
+    m_operatorController.povDown().onTrue(
+      new SequentialCommandGroup(
+         new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kClimbHigh),
+       new MoveClimbToSetpoint(climb, ClimbConstants.kHome)
+      
+      )
 
-      new AlignXandYWithPhoton(s_driveSubsystem, photon, true, 0, 0, 0, 0)
-    ); 
+    );
 
-    m_driverController.y().onTrue(new InstantCommand(() -> s_driveSubsystem.zeroHeading()));
+    // m_operatorController.povUp().onTrue(
+    //   new SequentialCommandGroup(
+    //     //  new MoveArmToSetpoint(s_ArmSubsystem, ArmConstants.kClimbHigh),
+    //    new MoveClimbToSetpoint(climb, ClimbConstants.kclimbReset)
+       
+    //   )
+    // );
 
+    // m_operatorController.povUp().onTrue(
+    //   new MoveClimbManually(climb, 0.1)
+    // );
 
-    // m_driverController.x().onTrue(
-    // // new autoAlignmentToFeeder(s_driveSubsystem, photon,false)
-    //   //new twoPieceRobotRight(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right")
-    // //  new twoPieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "left", false)
-    //   //  new onePieceRobotRight(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right")
-    //   new twoPieceRobotRight(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right")
-    // ); 
-
-    // m_driverController.x().onFalse(
-    //   new autoAlignmentToFeeder(s_driveSubsystem, photon,true)
-    // ); 
-
-    m_driverController.x().onTrue(
-      new InstantCommand(() -> s_driveSubsystem.adjustGyroToAngle(180))
-
-    ); 
-
+    // m_operatorController.povUp().onFalse(
+    //   new MoveClimbManually(climb, 0)
+    // );
   }
 
   /**

@@ -85,5 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Desired: ", ElevatorConstants.kLevel4);
     SmartDashboard.putNumber("elevator 1 encoder: ", getElevator1Position());
     SmartDashboard.putNumber("elevator 2 encoder: ", getElevator2Position());
+    SmartDashboard.putNumber("maxEle1Velocity", m_elevator1Encoder.getVelocity());
+    SmartDashboard.putNumber("maxEle2Velocity", m_elevator2Encoder.getVelocity());
   }
 }
