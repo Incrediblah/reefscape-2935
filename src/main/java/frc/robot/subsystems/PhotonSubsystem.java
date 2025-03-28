@@ -3,13 +3,11 @@ package frc.robot.subsystems;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
-import org.photonvision.EstimatedRobotPose;
-import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutoConstants;
 
-import java.util.Optional;
+
 
 public class PhotonSubsystem extends SubsystemBase {
     private PhotonCamera camera = new PhotonCamera("USB_Camera"); // Replace with actual camera name
@@ -42,6 +40,36 @@ public class PhotonSubsystem extends SubsystemBase {
         return (target != null) ? target.getFiducialId() : -1;
     }
 
+
+    public PhotonTrackedTarget getSpecificTarget(int tagId){
+        
+        PhotonPipelineResult result = camera.getLatestResult(); 
+
+        if(!result.hasTargets()){
+            return null; 
+        }
+
+
+        for(PhotonTrackedTarget target : result.getTargets()){
+            if (target.getFiducialId() == tagId){
+                return target; 
+            }
+        }
+
+        return null; 
+    }
+
+    public double getYawToSpecificTarget(int tagId) {
+        PhotonTrackedTarget target = getSpecificTarget(tagId);
+        return (target != null) ? target.getYaw() : 0.0;
+    }
+
+    public double getPitchToSpecific(int tagId) {
+        PhotonTrackedTarget target = getSpecificTarget(tagId);
+        return (target != null) ? target.getPitch() : 0.0;
+    }
+
+
     public void updateLastSeenAprilTag() {
         int tagID = getBestAprilTagID();
         if (tagID != -1) {
@@ -72,7 +100,27 @@ public class PhotonSubsystem extends SubsystemBase {
                 default: return 0; 
             }
         }
+
+      
          else{
+            return 0; 
+        }
+    }
+
+    public double getFeederAngleOffset(int tagID, String mode) {
+
+        if(mode == AutoConstants.autoMode){
+            switch (tagID) {
+                case 1: return -25; 
+                case 2: return 5; 
+                case 12: return 5; 
+                case 13: return -25; 
+                default: return 0; // If no valid tag, assume no turn needed
+            }
+        }
+
+        
+        else{
             return 0; 
         }
     }

@@ -4,16 +4,17 @@
 
 package frc.robot.commands.auto.onePieceAutos;
 
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.MoveElevatorToSetpoint;
 import frc.robot.commands.armCommands.MoveArmToSetpoint;
+import frc.robot.commands.autoBlocks.autoAlignmentToReef;
 import frc.robot.commands.autoBlocks.autoScoreCoral;
+import frc.robot.commands.coralIntakeCommands.CoralOutakeSensorCmd;
 import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
@@ -21,38 +22,35 @@ import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.VisionSubsystem;
 
-
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class onePieceRobotCentre extends SequentialCommandGroup {
-  /** Creates a new onePieceRobotCentre. */
-  public onePieceRobotCentre(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside) {
+public class onePieceRightAlt extends SequentialCommandGroup {
+  /** Creates a new onePieceRightAlt. */
+  public onePieceRightAlt(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
 
-
     new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
       new InstantCommand(() -> drive.zeroHeading()),
-      new InstantCommand(() -> drive.adjustGyroToAngle(0)), 
+      new InstantCommand(() -> drive.adjustGyroToAngle(60)), 
 
-
-
-
+      new ParallelCommandGroup(
+        new SequentialCommandGroup(
+          new MoveArmToSetpoint(arm, ArmConstants.kLevel4), 
+          new MoveElevatorToSetpoint(elevator,ElevatorConstants.kLevel4)
+        ),
+       
       
-      // new DriveDistanceCmd(drive, 0.45, 1, false), 
-       new SequentialCommandGroup(
-        new MoveArmToSetpoint(arm, ArmConstants.kLevel4), 
-        new MoveElevatorToSetpoint(elevator, ElevatorConstants.kLevel4)
-        ), 
-      new autoScoreCoral(drive, vision, elevator, arm, intake, "right",AutoConstants.autoMode),
+        new SequentialCommandGroup(
+          new DriveDistanceCmd(drive, 0.75, 1, false, 3000), 
+          new autoAlignmentToReef(drive, vision, "right", false, reefside)
+        )
+      ), 
 
-      new InstantCommand(() -> drive.zeroHeading()),
-
-      new InstantCommand(() -> drive.adjustGyroToAngle(180))
-
-
+        new CoralOutakeSensorCmd(intake)
+      
     );
   }
 }

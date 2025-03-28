@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
@@ -19,12 +20,12 @@ import frc.robot.Constants.ElevatorConstants;
 public class ElevatorSubsystem extends SubsystemBase {
   
   // Setup the first Elevator Motor
-  private SparkMax m_elevator1 = new SparkMax(ElevatorConstants.kElevator1CanId, MotorType.kBrushless);
+  private SparkFlex m_elevator1 = new SparkFlex(ElevatorConstants.kElevator1CanId, MotorType.kBrushless);
   private SparkClosedLoopController m_elevator1Controller = m_elevator1.getClosedLoopController();
   private RelativeEncoder m_elevator1Encoder = m_elevator1.getEncoder();
 
   // Setup the second Elevator Motor
-  private SparkMax m_elevator2 = new SparkMax(ElevatorConstants.kElevator2CanId, MotorType.kBrushless);
+  private SparkFlex m_elevator2 = new SparkFlex(ElevatorConstants.kElevator2CanId, MotorType.kBrushless);
   private SparkClosedLoopController m_elevator2Controller = m_elevator2.getClosedLoopController();
   private RelativeEncoder m_elevator2Encoder = m_elevator2.getEncoder();
 
@@ -53,8 +54,8 @@ public class ElevatorSubsystem extends SubsystemBase {
   // This method moves the elevator to the specified setpoint using MaxMotion
   // MaxMotion is a trapozoidal profile and we can manipulate its PID, velocity and acceleration in configs
   public void moveElevatorToPosition(double Setpoint) {
-    m_elevator1Controller.setReference(Setpoint, ControlType.kMAXMotionPositionControl);
-    m_elevator2Controller.setReference(Setpoint, ControlType.kMAXMotionPositionControl);
+    m_elevator1Controller.setReference(Setpoint, ControlType.kPosition);
+    m_elevator2Controller.setReference(Setpoint, ControlType.kPosition);
   }
 
   // Get the position of Elevator Motor 1
@@ -85,5 +86,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Desired: ", ElevatorConstants.kLevel4);
     SmartDashboard.putNumber("elevator 1 encoder: ", getElevator1Position());
     SmartDashboard.putNumber("elevator 2 encoder: ", getElevator2Position());
+    SmartDashboard.putNumber("maxEle1Velocity", m_elevator1Encoder.getVelocity());
+    SmartDashboard.putNumber("maxEle2Velocity", m_elevator2Encoder.getVelocity());
   }
 }

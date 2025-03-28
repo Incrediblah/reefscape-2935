@@ -5,7 +5,7 @@
 package frc.robot.commands.autoBlocks;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.photonCommands.AlignXandYWithPhoton;
 import frc.robot.commands.photonCommands.PhotonTurnToTagCmd;
 import frc.robot.Constants.AutoConstants;
@@ -23,8 +23,8 @@ public class autoAlignmentToFeeder extends SequentialCommandGroup {
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
       new PhotonTurnToTagCmd(drive, photon, endCommand,AutoConstants.autoMode),
-       new AlignXandYWithPhoton(drive, photon, endCommand, photonVisionConstants.FeederCamTagYaw, photonVisionConstants.FeederCamTagPitch, photonVisionConstants.xTol, photonVisionConstants.yTol),
-       new DriveForwardDistance(drive, -0.15, 0.18, endCommand)
+       new AlignXandYWithPhoton(drive, photon, endCommand, photon.getFeederAngleOffset(photon.getBestAprilTagID(), AutoConstants.autoMode), photonVisionConstants.FeederCamTagPitch, photonVisionConstants.xTol, photonVisionConstants.yTol),
+       new DriveDistanceCmd(drive, 0.15, -0.36, endCommand, 1000)
     );
     drive.adjustGyroToAngle(photon.getFeederAngleForTag(photon.getBestAprilTagID(),AutoConstants.autoMode)); 
   }

@@ -203,6 +203,12 @@ public class DriveSubsystem extends SubsystemBase {
     gyroOffset = expectedAngle - currentAngle; 
   }
 
+
+//   public void setHeading(double desiredAngle) {
+//     double currentAngle = getHeading();
+//     gyroOffset += desiredAngle - currentAngle;
+// }
+
   public double getHeading() {
     return Math.IEEEremainder(-m_gyro.getAngle() + gyroOffset,360);
   }

@@ -1,154 +1,164 @@
 // package frc.robot.commands.limelightCommands;
 
 // import edu.wpi.first.math.controller.PIDController;
-// import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 // import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 // import edu.wpi.first.wpilibj2.command.Command;
 // import frc.robot.subsystems.VisionSubsystem;
+// import frc.robot.Constants.VisionConstants;
 // import frc.robot.subsystems.DriveSubsystem;
+// import edu.wpi.first.math.MathUtil;
 
-// /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 // public class alignXandYLeftCamera extends Command {
 
-  
-//   private VisionSubsystem VISION_SUBSYSTEM; 
-//   private DriveSubsystem DRIVE_SUBSYSTEM; 
+//     private final VisionSubsystem VISION_SUBSYSTEM; 
+//     private final DriveSubsystem DRIVE_SUBSYSTEM; 
 
-//   private PIDController strafePID; 
-//   private PIDController drivePID; 
+//     private final PIDController strafePID; 
+//     private final PIDController drivePID; 
+//     private final PIDController rotationPID; // NEW: Keeps robot locked to target angle
 
-//   private boolean endCommand; 
-//   private int setPipelineNumber; 
+//     private final boolean endCommand; 
+//     private final int setPipelineNumber; 
 
-//   private double measuredValueX; 
-//   private double measuredValueY; 
+//     private double measuredValueX; 
+//     private double measuredValueY; 
 
-//   private double strafeSpeed; 
-//   private double driveSpeed;
+//     private double strafeSpeed; 
+//     private double driveSpeed;
+//     private double rotationSpeed; // NEW: Stores rotation correction
 
-//   private double toleranceX;
-//   private double toleranceY;
+//     private final double toleranceX;
+//     private final double toleranceY;
 
+//     private final double targetValueX; 
+//     private final double targetValueY;
+//     private double targetAngle; // NEW: Stores locked heading
 
-//   private double targetValueX; 
-//   private double targetValueY;
+//     private boolean inRangeX; 
+//     private boolean inRangeY; 
 
+//     /** Creates a new alignmentCommand. */
+//     public alignXandYLeftCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
+//                                 double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
+//         this.DRIVE_SUBSYSTEM = drive; 
+//         this.VISION_SUBSYSTEM = vision; 
 
-//   private boolean inRangeX; 
-//   private boolean inRangeY; 
+//          this.drivePID = new PIDController(VisionConstants.driveAlignKp,VisionConstants.driveAlignKi, VisionConstants.driveAlignKd); 
+//         this.strafePID = new PIDController(VisionConstants.strafeAlignKp,VisionConstants.strafeAlignKi, VisionConstants.strafeAlignKd);
+//         this.rotationPID = new PIDController(VisionConstants.rotAlignKp,VisionConstants.rotAlignKi, VisionConstants.rotAlignKd); // NEW: Controls unintended turning
 
-//   /** Creates a new alignmentCommand. */
-//   public alignXandYLeftCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY) {
-//     // Use addRequirements() here to declare subsystem dependencies.
-    
-//     this.DRIVE_SUBSYSTEM = drive; 
-//     this.VISION_SUBSYSTEM = vision; 
+//         this.endCommand = end; 
+//         this.setPipelineNumber = pipeline; 
 
-//     this.drivePID = new PIDController(0.04, 0, 0); 
-//     this.strafePID = new PIDController(0.015, 0, 0.0015); 
+//         this.targetValueX = targetOffsetX;
+//         this.targetValueY = targetOffsetY;  
 
-//     this.endCommand = end; 
-//     this.setPipelineNumber = pipeline; 
-
-//     this.targetValueX = targetOffsetX;
-//     this.targetValueY = targetOffsetY;  
-
-//     this.toleranceX = toleranceX; 
-//     this.toleranceY = toleranceY; 
-  
-//     addRequirements(DRIVE_SUBSYSTEM);
-//     addRequirements(VISION_SUBSYSTEM);
-//   }
-
-//   // Called when the command is initially scheduled.
-//   @Override
-//   public void initialize() {
-//     drivePID.reset();
-//     strafePID.reset();
-//     VISION_SUBSYSTEM.setLeftPipeline(setPipelineNumber);
-//     inRangeX = false; 
-//     inRangeY = false; 
-//   }
-
-//   // Called every time the scheduler runs while the command is scheduled.
-//   @Override
-//   public void execute() {
-    
-//     if(VISION_SUBSYSTEM.limelightLeftTargetSeen()){
-//       measuredValueY = VISION_SUBSYSTEM.getLeftTy();
-//       measuredValueX = VISION_SUBSYSTEM.getLeftTx();  
-
-//       //x-direction 
-//       if (Math.abs(targetValueX - measuredValueX) <= toleranceX) { 
-//         strafeSpeed = 0; 
-//         inRangeX = true; 
-//       } 
-//       else{
-//         strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
-//       }
-
-//       if(strafeSpeed > 0.15){
-//         strafeSpeed = 0.15; 
-//       }else if(strafeSpeed < -0.15){
-//         strafeSpeed = -0.15; 
-//       }
-
-//       // y-direction 
-//       if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
-//         driveSpeed = 0; 
-//         inRangeY = true; 
-//       } 
-//       else{
-//         driveSpeed = drivePID.calculate(measuredValueY, targetValueY);
-//       }
-     
-
-//       if(driveSpeed > 0.25){
-//         driveSpeed = 0.25; 
-//       }else if(driveSpeed < -0.25){
-//         driveSpeed = -0.25; 
-//       }
+//         this.toleranceX = toleranceX; 
+//         this.toleranceY = toleranceY; 
       
-//     }else{
-//       driveSpeed = 0; 
+//         addRequirements(DRIVE_SUBSYSTEM, VISION_SUBSYSTEM);
 //     }
 
-//     SmartDashboard.putNumber("align speed", driveSpeed); 
-//     SmartDashboard.putBoolean("in range x", inRangeX); 
-//     SmartDashboard.putBoolean("in range y", inRangeY); 
-//     DRIVE_SUBSYSTEM.drive(-driveSpeed, -strafeSpeed, 0, false);
+//     @Override
+//     public void initialize() {
+//         drivePID.reset();
+//         strafePID.reset();
+//         rotationPID.reset(); // NEW: Reset rotation PID
 
-//   }
+//         VISION_SUBSYSTEM.setLeftPipeline(setPipelineNumber);
+//         inRangeX = false; 
+//         inRangeY = false; 
 
-//   // Called once the command ends or is interrupted.
-//   @Override
-//   public void end(boolean interrupted) {
-//     driveSpeed = 0;
-//     strafeSpeed = 0; 
-//   }
+//         targetAngle = DRIVE_SUBSYSTEM.getHeading(); 
 
-//   // Returns true when the command should end.
-//   @Override
-//   public boolean isFinished() {
-//     if(endCommand){
-//       return true; 
-//     }else if(inRangeX && inRangeY){
-//       return true; 
+//         VISION_SUBSYSTEM.setLeftPipeline(0);
+//         VISION_SUBSYSTEM.setLeftPipeline(0);
+
+//         VISION_SUBSYSTEM.setLeftLED(1);
+//         VISION_SUBSYSTEM.setLeftLED(1);
 //     }
-//     else{
-//       return false; 
+
+//     @Override
+//     public void execute() {
+//         if(VISION_SUBSYSTEM.limelightLeftTargetSeen()){
+//             measuredValueY = VISION_SUBSYSTEM.getLeftTy();
+//             measuredValueX = VISION_SUBSYSTEM.getLeftTx();  
+
+//             // X-direction (Strafing)
+//             if (Math.abs(targetValueX - measuredValueX) <= toleranceX) { 
+//                 strafeSpeed = 0; 
+//                 inRangeX = true; 
+//             } else {
+//                 strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
+//             }
+//             strafeSpeed = MathUtil.clamp(strafeSpeed, -0.75, 0.75); // Keep existing limits
+
+//             // Y-direction (Forward movement)
+//             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
+//                 driveSpeed = 0; 
+//                 inRangeY = true; 
+//             } else {
+//                 driveSpeed = drivePID.calculate(measuredValueY, targetValueY);
+//             }
+//             driveSpeed = MathUtil.clamp(driveSpeed, -0.75, 0.75); // Keep existing limits
+
+//             // NEW: Lock robot to the set angle and prevent unnecessary rotation
+//             double currentHeading = DRIVE_SUBSYSTEM.getHeading();
+//             rotationSpeed = rotationPID.calculate(currentHeading, targetAngle);
+//             rotationSpeed = MathUtil.clamp(rotationSpeed, -0.2, 0.2); // Small corrections only
+
+//             SmartDashboard.putNumber("Align Strafe Speed", strafeSpeed); 
+//             SmartDashboard.putNumber("Align Drive Speed", driveSpeed);
+//             SmartDashboard.putNumber("Align Rotation Speed", rotationSpeed); // NEW: Monitor rotation correction
+//             SmartDashboard.putBoolean("In Range X", inRangeX); 
+//             SmartDashboard.putBoolean("In Range Y", inRangeY);
+
+//             // Drive using corrected values, preventing unnecessary rotation
+//             DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
+//             // DRIVE_SUBSYSTEM.drive(driveSpeed, 0, rotationSpeed, false);
+
+//         } else {
+//             driveSpeed = 0;
+//             strafeSpeed = 0;
+//             rotationSpeed = 0;
+//         }
 //     }
-//   }
+
+//     @Override
+//     public void end(boolean interrupted) {
+//         DRIVE_SUBSYSTEM.drive(0, 0, 0, false); // Stop all movement
+
+
+//     }
+
+//     @Override
+//     public boolean isFinished() {
+//         if(endCommand){
+//             return true; 
+//         } else if(inRangeX && inRangeY){
+//             return true; 
+//         } else {
+//             return false; 
+//         }
+//     }
 // }
 
 
 
+/// 
+/// 
+
+
+
+
+//// UPDATE WITH ALIGNMENT + ROTATION, PREVIOUS VERSION IS NO ROTATION, JUST CLAMPS THE START HEADING
 package frc.robot.commands.limelightCommands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command; 
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.MathUtil;
@@ -182,7 +192,7 @@ public class alignXandYLeftCamera extends Command {
     private boolean inRangeX; 
     private boolean inRangeY; 
 
-    
+    private boolean validTagDetected = false;
 
     /** Creates a new alignmentCommand. */
     public alignXandYLeftCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
@@ -190,7 +200,7 @@ public class alignXandYLeftCamera extends Command {
         this.DRIVE_SUBSYSTEM = drive; 
         this.VISION_SUBSYSTEM = vision; 
 
-        this.drivePID = new PIDController(VisionConstants.driveAlignKp,VisionConstants.driveAlignKi, VisionConstants.driveAlignKd); 
+         this.drivePID = new PIDController(VisionConstants.driveAlignKp,VisionConstants.driveAlignKi, VisionConstants.driveAlignKd); 
         this.strafePID = new PIDController(VisionConstants.strafeAlignKp,VisionConstants.strafeAlignKi, VisionConstants.strafeAlignKd);
         this.rotationPID = new PIDController(VisionConstants.rotAlignKp,VisionConstants.rotAlignKi, VisionConstants.rotAlignKd); // NEW: Controls unintended turning
 
@@ -202,9 +212,8 @@ public class alignXandYLeftCamera extends Command {
 
         this.toleranceX = toleranceX; 
         this.toleranceY = toleranceY; 
-  
+      
         addRequirements(DRIVE_SUBSYSTEM, VISION_SUBSYSTEM);
-        
     }
 
     @Override
@@ -217,17 +226,35 @@ public class alignXandYLeftCamera extends Command {
         inRangeX = false; 
         inRangeY = false; 
 
-        targetAngle = DRIVE_SUBSYSTEM.getHeading();
-        
- 
+        int detectedTag = VISION_SUBSYSTEM.getBestAprilTag(); // Get best detected tag ID
+
+        if (detectedTag != -1) { // Ensure a valid tag was detected
+            validTagDetected = true;
+            targetAngle = VISION_SUBSYSTEM.getReefAngleForTag(detectedTag, AutoConstants.autoMode); // Get pre-defined reef angle
+        } else {
+            validTagDetected = false;
+        }
+     
+        // targetAngle = DRIVE_SUBSYSTEM.getHeading(); 
+
+
+        VISION_SUBSYSTEM.setLeftPipeline(0);
+        VISION_SUBSYSTEM.setLeftPipeline(0);
+
+        VISION_SUBSYSTEM.setLeftLED(1);
+        VISION_SUBSYSTEM.setLeftLED(1);
+
+        driveSpeed = 0;
+        strafeSpeed = 0;
+        rotationSpeed = 0;
     }
 
     @Override
     public void execute() {
         if(VISION_SUBSYSTEM.limelightLeftTargetSeen()){
             measuredValueY = VISION_SUBSYSTEM.getLeftTy();
-            measuredValueX = VISION_SUBSYSTEM.getLeftTx(); 
-            
+            measuredValueX = VISION_SUBSYSTEM.getLeftTx();  
+
             // X-direction (Strafing)
             if (Math.abs(targetValueX - measuredValueX) <= toleranceX) { 
                 strafeSpeed = 0; 
@@ -235,9 +262,7 @@ public class alignXandYLeftCamera extends Command {
             } else {
                 strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
             }
-            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.25, 0.25); // Keep existing limits
-
-            
+            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.4, 0.4); // Keep existing limits
 
             // Y-direction (Forward movement)
             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
@@ -246,36 +271,35 @@ public class alignXandYLeftCamera extends Command {
             } else {
                 driveSpeed = drivePID.calculate(measuredValueY, targetValueY);
             }
-            driveSpeed = MathUtil.clamp(driveSpeed, -0.35, 0.35); // Keep existing limits
+            driveSpeed = MathUtil.clamp(driveSpeed, -0.5, 0.5); // Keep existing limits
 
             // NEW: Lock robot to the set angle and prevent unnecessary rotation
             double currentHeading = DRIVE_SUBSYSTEM.getHeading();
             rotationSpeed = rotationPID.calculate(currentHeading, targetAngle);
-            rotationSpeed = MathUtil.clamp(rotationSpeed, -0.2, 0.2); // Small corrections only
+            rotationSpeed = MathUtil.clamp(rotationSpeed, -0.4, 0.4); // Small corrections only
 
             SmartDashboard.putNumber("Align Strafe Speed", strafeSpeed); 
             SmartDashboard.putNumber("Align Drive Speed", driveSpeed);
             SmartDashboard.putNumber("Align Rotation Speed", rotationSpeed); // NEW: Monitor rotation correction
             SmartDashboard.putBoolean("In Range X", inRangeX); 
             SmartDashboard.putBoolean("In Range Y", inRangeY);
-            
 
             // Drive using corrected values, preventing unnecessary rotation
-            DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
+            // DRIVE_SUBSYSTEM.drive(driveSpeed, 0, rotationSpeed, false);
 
         } else {
-            driveSpeed = 0;
-            strafeSpeed = 0;
-            rotationSpeed = 0;
+            driveSpeed *= 0.75;
+            strafeSpeed *= 0.75;
+            rotationSpeed *= 0.75;
         }
+
+        DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
     }
 
     @Override
     public void end(boolean interrupted) {
         DRIVE_SUBSYSTEM.drive(0, 0, 0, false); // Stop all movement
 
-        VISION_SUBSYSTEM.setLeftPipeline(0);
-        VISION_SUBSYSTEM.setRightPipeline(0);
 
     }
 
@@ -290,3 +314,4 @@ public class alignXandYLeftCamera extends Command {
         }
     }
 }
+

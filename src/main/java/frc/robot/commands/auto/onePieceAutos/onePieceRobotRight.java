@@ -4,18 +4,17 @@
 
 package frc.robot.commands.auto.onePieceAutos;
 
-import java.time.Instant;
-
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
-import frc.robot.Constants.pathConstants;
-import frc.robot.commands.autoBlocks.autoAlignmentToReef;
+import frc.robot.Constants.CoralSystemContants;
+import frc.robot.commands.moveCoralSystemToPosition;
+import frc.robot.commands.armCommands.MoveArmToSetpoint;
 import frc.robot.commands.autoBlocks.autoScoreCoral;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
-import frc.robot.commands.driveCommands.OdometryCmd;
-import frc.robot.commands.driveCommands.TurnToAngleCommand;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -31,17 +30,20 @@ public class onePieceRobotRight extends SequentialCommandGroup {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
     addCommands(
-      // new DriveForwardDistance(drive, 0.15, 1.5, false),
+      
       
       new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
       new InstantCommand(() -> drive.zeroHeading()),
       new InstantCommand(() -> drive.adjustGyroToAngle(60)), 
-      
-      // new OdometryCmd(drive, pathConstants.onePieceDepositRobotRight),
-      // new TurnToAngleCommand(drive, 60),
-      //new autoAlignmentToReef(drive, vision, "right", false, AutoConstants.autoMode)
-      new DriveForwardDistance(drive, 0.45, 1.5, false), 
+
+      new ParallelCommandGroup(
+        new DriveDistanceCmd(drive, 0.55, 1, false, 3000), 
+        new MoveArmToSetpoint(arm, ArmConstants.kLevel4)
+      ), 
+
       new autoScoreCoral(drive, vision, elevator, arm, intake, "right",AutoConstants.autoMode)
+      
+
     );
   }
 }

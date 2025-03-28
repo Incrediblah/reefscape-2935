@@ -3,7 +3,8 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.revrobotics.AbsoluteEncoder;
+//import com.revrobotics.AbsoluteEncoder;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -20,7 +21,7 @@ public class ClimbSubsystem extends SubsystemBase {
 
   private SparkMax m_climb = new SparkMax(ClimbConstants.kClimbCanId, MotorType.kBrushless);
   private SparkClosedLoopController m_climbController = m_climb.getClosedLoopController();
-  private AbsoluteEncoder m_climbEncoder = m_climb.getAbsoluteEncoder();
+  private RelativeEncoder m_climbEncoder = m_climb.getEncoder();
 
   /** Creates a new ClimbSubsystem. */
   public ClimbSubsystem() {
@@ -30,6 +31,7 @@ public class ClimbSubsystem extends SubsystemBase {
       ResetMode.kResetSafeParameters, 
       PersistMode.kPersistParameters
     );
+    m_climbEncoder.setPosition(0);
 
   }
 
@@ -41,9 +43,13 @@ public class ClimbSubsystem extends SubsystemBase {
     return m_climbEncoder.getPosition();
   }
 
-  // public void resetClimbEncoder () {
-  //   m_climbEncoder.setPosition(0);
-  // }
+  public void resetClimbEncoder () {
+    m_climbEncoder.setPosition(0);
+  }
+
+  public void setClimbSpeed(double climbSpeed) {
+    m_climb.set(climbSpeed);
+  }
 
   public void stopClimbMotor () {
     m_climb.stopMotor();

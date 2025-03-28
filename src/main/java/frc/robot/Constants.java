@@ -25,7 +25,7 @@ public final class Constants {
 
   public static class DriverControllerConstants {
     public static final int kDriverControllerPort = 0;
-    public static final double kDriveDeadband = 0.05;
+    public static final double kDriveDeadband = 0.1;
   }
 
   public static class OperatorControllerConstants {
@@ -93,14 +93,22 @@ public final class Constants {
     public static final int kElevator2CanId = 51;
 
     public static final double kHome = 0;
-    public static final double kFeederStation = 19; //14
+    public static final double kFeederStation = 5; //14 //55
     public static final double kTravel = 0;
 
     public static final double kLevel1 = 0;
-    public static final double kLevel2 = 0; //16
+    public static final double kLevel2 = 0;
+     //16
     public static final double kLevel3 = 0; // 5
-    public static final double kLevel4 = 67; //88
+    public static final double kLevel4 = 30;//72 //88
+    public static final double kHigh = 25;//72 //88
+    public static final double kLevelClimb=11.3;
+    
 
+
+    public static final double elevator_Kp = 0.25; // 0.25
+    public static final double elevator_Ki = 0.000001; // 0
+    public static final double elevator_Kd = 1; // 1
 
   }
 
@@ -108,14 +116,17 @@ public final class Constants {
 
     public static final int kArmCanId = 55;
 
-    public static final double kHome = 0.3; //-10
-    public static final double kFeederStation = 0.2; // -4
-    public static final double kTravel = 0;
+    public static final double kHome = 0.9; //-10
+    public static final double kFeederStation = 0.35; // -4
+    public static final double kClimbPosition = 0;
 
-    public static final double kLevel1 = 0;
-    public static final double kLevel2 = 0; //-7
+    public static final double kLevel1 = 0.4;
+    public static final double kLevel2 = 2.7; //-7
     public static final double kLevel3 = 3.35;
     public static final double kLevel4 = 3.2; //84
+    public static final double kClimbHigh = 5.1; //84
+    public static final double kLevelClimb = 5.1; //84
+
 
 
   }
@@ -124,8 +135,13 @@ public final class Constants {
 
     public static final int kClimbCanId = 57;
 
-    public static final double kHome = 0; 
-    public static final double kclimb= 5;
+    public static final double kclimbUp = 95; 
+    public static final double kclimbOut= 230;
+    public static final double kclimbReset=-100;
+    public static final double kHome=0;
+    public static final double climbSpeed=-0.1;
+    public static final double noSpeed=0;
+    
     
 
 
@@ -136,8 +152,11 @@ public final class Constants {
     public static final int kCoralIntakeCanId = 60;
 
     public static final double kCoralIntakeSpeed = 1;
-    public static final double kCoralOutakeSpeed = -1;
-    public static final double kCoralNoSpeed = -0.1;
+    public static final double kCoralOutakeSpeed = -0.85;
+    public static final double kCoralSlowOutakeSpeed = -0.6;
+    // public static final double kCoralOutakeSlowSpeed = -0.45;
+    public static final double kCoralNoSpeed = 0.085;
+    public static final double kCoralAutoOutake = -0.6;//0.6
 
 
     public static final int intakeSwitchPort = 0; 
@@ -147,11 +166,11 @@ public final class Constants {
   public static class VisionConstants {
 
     // coral alignment points 
-    public static final double leftCamTagX = 9.5;
-    public static final double leftCamTagY = -0.7;
+    public static final double leftCamTagX = 8.5;
+    public static final double leftCamTagY = 1.78;
 
-    public static final double rightCamTagX = -7.8;
-    public static final double rightCamTagY = -1.18;
+    public static final double rightCamTagX = -11.16;
+    public static final double rightCamTagY = 0.11;
 
     // coral tolerances 
     public static final double xTol = 0.5; 
@@ -159,17 +178,19 @@ public final class Constants {
     
     
     //pid stuff
-    public static final double driveAlignKp = 0.075; 
-    public static final double driveAlignKi = 0;
-    public static final double driveAlignKd =0;
+    public static final double driveAlignKp = 0.0625; 
+    public static final double driveAlignKi = 0.0001;
+    public static final double driveAlignKd =0.005;
     
-    public static final double strafeAlignKp = 0.035;
-    public static final double strafeAlignKi = 0;
-    public static final double strafeAlignKd = 0.0015;
+    public static final double strafeAlignKp = 0.025; //0.035
+    public static final double strafeAlignKi = 0.0005; //0 
+    public static final double strafeAlignKd = 0.0005; //0.0015
 
-    public static final double rotAlignKp = 0.01; 
+    public static final double rotAlignKp = 0.0275; 
     public static final double rotAlignKi = 0;
-    public static final double rotAlignKd = 0.001;
+    public static final double rotAlignKd = 0.0005;
+
+    public static final int aprilTagPipeline = 0; 
   }
 
   
@@ -181,7 +202,7 @@ public final class Constants {
 
     public static final double kPXController = 0.25;
     public static final double kPYController = 0.25;
-    public static final double kPThetaController = 1;
+    public static final double kPThetaController = 0.95;
 
     // Constraint for the motion profiled robot angle controller
     public static final TrapezoidProfile.Constraints kThetaControllerConstraints = new TrapezoidProfile.Constraints(
@@ -197,7 +218,7 @@ public final class Constants {
     public static String tagCameraName= "feedercamera";
 
 
-    public static final double FeederCamTagYaw = -15;
+    public static final double FeederCamTagYaw = -25;
     public static final double FeederCamTagPitch = 43;
 
 
@@ -241,10 +262,16 @@ public final class Constants {
 
   public class StatusVariables{
     public static boolean isLinedUpToReef;
-    public static boolean hasCoral;  
+    public static boolean hasCoral; 
   }
 
-
-
-
+  public static class CoralSystemContants{
+    public static int HOME = 0; 
+    public static int L1 = 1; 
+    public static int L2 = 2; 
+    public static int L3 = 3; 
+    public static int L4 = 4; 
+    public static int CLIMB = 5; 
+    public static int FEEDER = 6; 
+  }
 }
