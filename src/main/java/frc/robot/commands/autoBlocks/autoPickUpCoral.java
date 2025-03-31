@@ -11,13 +11,14 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.MoveElevatorToSetpoint;
 import frc.robot.commands.armCommands.MoveArmToSetpoint;
 import frc.robot.commands.coralIntakeCommands.CoralIntakeForTimeCmd;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
+import frc.robot.commands.coralIntakeCommands.CoralIntakeSensorCmd;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.PhotonSubsystem;
-import frc.robot.subsystems.VisionSubsystem;
+
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -31,7 +32,7 @@ public class autoPickUpCoral extends SequentialCommandGroup {
       new ParallelCommandGroup(
 
         new SequentialCommandGroup(
-          new autoAlignmentToFeeder(drive, photon, endCommand)
+          new autoAlignmentToFeeder(drive, photon, endCommand, "right")
         ), 
 
         new SequentialCommandGroup(
@@ -41,8 +42,8 @@ public class autoPickUpCoral extends SequentialCommandGroup {
 
       ), 
 
-      new CoralIntakeForTimeCmd(intake, -1, 2000), 
-      new DriveForwardDistance(drive, 0.15, 0.4, false), 
+      new CoralIntakeSensorCmd(intake),
+      new DriveDistanceCmd(drive, 0.15, 1, false, 2000), 
       new MoveArmToSetpoint(arm, ArmConstants.kHome), 
       new MoveElevatorToSetpoint(elevator, ElevatorConstants.kHome)  
     );

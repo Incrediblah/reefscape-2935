@@ -1,46 +1,51 @@
-package frc.robot.commands.photonCommands;
+package frc.robot.commands.limelightCommands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.subsystems.PhotonSubsystem;
+import frc.robot.subsystems.VisionSubsystem;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.subsystems.DriveSubsystem;
-
-
-
 import edu.wpi.first.math.MathUtil;
 
-public class PhotonTurnToTagCmd extends Command {
+public class TurnToSpecificAprilTagCommand extends Command {
     private final DriveSubsystem DRIVE_SUBSYSTEM;
-    private final PhotonSubsystem PHOTON_SUBSYSTEM;
+    private final VisionSubsystem VISION_SUBSYSTEM;
     private final PIDController turnPID;
     private double targetAngle;
     private boolean validTagDetected = false;
-    private String driveMode; 
-
 
     private boolean endCommand; 
 
-    public PhotonTurnToTagCmd(DriveSubsystem driveSubsystem, PhotonSubsystem photonSubsystem, boolean end, String mode) {
+    private String driveMode; 
+
+    private int tagId; 
+
+    public TurnToSpecificAprilTagCommand(DriveSubsystem driveSubsystem, VisionSubsystem visionSubsystem, boolean end, String mode, int id) {
         this.DRIVE_SUBSYSTEM = driveSubsystem;
-        this.PHOTON_SUBSYSTEM = photonSubsystem;
+        this.VISION_SUBSYSTEM = visionSubsystem;
         this.turnPID = new PIDController(0.2, 0, 0.005); // Tune values as needed
-        this.driveMode= mode;
         this.endCommand = end; 
+        this.driveMode = mode; 
+
+        this.tagId = id; 
         turnPID.enableContinuousInput(-180, 180);
-        addRequirements(driveSubsystem, photonSubsystem);
+        addRequirements(driveSubsystem, visionSubsystem);
     }
 
     @Override
     public void initialize() {
-        int detectedTag = PHOTON_SUBSYSTEM. getBestAprilTagID(); // Get best detected tag ID
+        int detectedTag = VISION_SUBSYSTEM.getBestAprilTag(); // Get best detected tag ID
 
         if (detectedTag != -1) { // Ensure a valid tag was detected
             validTagDetected = true;
-            double feederAngle = PHOTON_SUBSYSTEM.getFeederAngleForTag(detectedTag, driveMode); // Get pre-defined feeder angle
-            targetAngle = feederAngle; // Set target angle directly to the feeder's expected angle
+            double reefAngle = VISION_SUBSYSTEM.getReefAngleForTag(tagId, AutoConstants.autoMode); // Get pre-defined reef angle
+            targetAngle = reefAngle; // Set target angle directly to the reef's expected angle
         } else {
             validTagDetected = false;
         }
+
+        SmartDashboard.putNumber("spceific tag rotation value", targetAngle); 
      
     }
 
@@ -74,5 +79,4 @@ public class PhotonTurnToTagCmd extends Command {
         }
     }
 
-   
 }

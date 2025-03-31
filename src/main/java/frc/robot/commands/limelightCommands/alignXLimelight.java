@@ -163,7 +163,7 @@ import frc.robot.Constants.VisionConstants;
 import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.MathUtil;
 
-public class alignXandYLeftCamera extends Command {
+public class alignXLimelight extends Command {
 
     private final VisionSubsystem VISION_SUBSYSTEM; 
     private final DriveSubsystem DRIVE_SUBSYSTEM; 
@@ -195,7 +195,7 @@ public class alignXandYLeftCamera extends Command {
     private boolean validTagDetected = false;
 
     /** Creates a new alignmentCommand. */
-    public alignXandYLeftCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
+    public alignXLimelight(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
                                 double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
         this.DRIVE_SUBSYSTEM = drive; 
         this.VISION_SUBSYSTEM = vision; 
@@ -263,7 +263,7 @@ public class alignXandYLeftCamera extends Command {
             } else {
                 strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
             }
-            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.7, 0.7); // Keep existing limits
+            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.4, 0.4); // Keep existing limits
 
             // Y-direction (Forward movement)
             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
@@ -294,7 +294,7 @@ public class alignXandYLeftCamera extends Command {
             rotationSpeed *= 0.75;
         }
 
-        DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
+        DRIVE_SUBSYSTEM.drive(0, strafeSpeed, rotationSpeed, false);
     }
 
     @Override
@@ -308,7 +308,7 @@ public class alignXandYLeftCamera extends Command {
     public boolean isFinished() {
         if(endCommand){
             return true; 
-        } else if(inRangeX && inRangeY){
+        } else if(inRangeX){
             return true; 
         } else {
             return false; 

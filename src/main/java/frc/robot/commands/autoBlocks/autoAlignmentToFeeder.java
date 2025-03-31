@@ -5,7 +5,7 @@
 package frc.robot.commands.autoBlocks;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.photonCommands.AlignXandYWithPhoton;
 import frc.robot.commands.photonCommands.PhotonTurnToTagCmd;
 import frc.robot.Constants.AutoConstants;
@@ -18,14 +18,28 @@ import frc.robot.subsystems.PhotonSubsystem;
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
 public class autoAlignmentToFeeder extends SequentialCommandGroup {
   /** Creates a new autoAlignmentToFeeder. */
-  public autoAlignmentToFeeder(DriveSubsystem drive, PhotonSubsystem photon,boolean endCommand) {
+
+
+  double xSet; 
+  double ySet; 
+  public autoAlignmentToFeeder(DriveSubsystem drive, PhotonSubsystem photon,boolean endCommand, String reefside) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
+
+    if(reefside == "left"){
+      xSet = photonVisionConstants.reefLeftCamTagYaw; 
+      ySet = photonVisionConstants.reefLeftCamTagPitch; 
+    }else if(reefside == "right"){
+      xSet = photonVisionConstants.reefRightCamTagYaw; 
+      ySet = photonVisionConstants.reefRightCamTagPitch; 
+    }
+
     addCommands(
-      new PhotonTurnToTagCmd(drive, photon, endCommand,AutoConstants.autoMode),
-       new AlignXandYWithPhoton(drive, photon, endCommand, photonVisionConstants.FeederCamTagYaw, photonVisionConstants.FeederCamTagPitch, photonVisionConstants.xTol, photonVisionConstants.yTol),
-       new DriveForwardDistance(drive, -0.15, 0.18, endCommand)
+      // new PhotonTurnToTagCmd(drive, photon, endCommand,AutoConstants.autoMode),
+
+       new AlignXandYWithPhoton(drive, photon, endCommand, xSet, ySet, photonVisionConstants.xTol, photonVisionConstants.yTol), 
+       new DriveDistanceCmd(drive, 0.18, 0.40, endCommand, 1500)
     );
-    drive.adjustGyroToAngle(photon.getFeederAngleForTag(photon.getBestAprilTagID(),AutoConstants.autoMode)); 
+    drive.adjustGyroToAngle(photon.getReefAngleForTag(photon.getBestAprilTagID(),AutoConstants.autoMode)); 
   }
 }

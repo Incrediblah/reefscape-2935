@@ -5,9 +5,12 @@
 package frc.robot.commands.autoBlocks;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.VisionConstants;
-import frc.robot.commands.driveCommands.DriveForwardDistance;
+import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.limelightCommands.TurnToAprilTagCommand;
 import frc.robot.commands.limelightCommands.alignXandYLeftCamera;
 import frc.robot.commands.limelightCommands.alignXandYRightCamera;
@@ -21,12 +24,15 @@ public class autoAlignmentToReef extends SequentialCommandGroup {
   
   Command visionCommand; 
   
+
+  // double adjustmentVariable = 0; 
+
   /** Creates a new autoScoreCoral. */
   public autoAlignmentToReef(DriveSubsystem drive, VisionSubsystem vision, String reefside,boolean endCommand, String mode) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    Command alignLeft = new alignXandYRightCamera(drive, vision, 0, false, VisionConstants.rightCamTagX, VisionConstants.rightCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
-    Command alignRight = new alignXandYLeftCamera(drive, vision, 0, false, VisionConstants.leftCamTagX, VisionConstants.leftCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
+    Command alignLeft = new alignXandYRightCamera(drive, vision, 0, endCommand, VisionConstants.rightCamTagX, VisionConstants.rightCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
+    Command alignRight = new alignXandYLeftCamera(drive, vision, 0, endCommand, VisionConstants.leftCamTagX, VisionConstants.leftCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
 
     if(reefside == "left"){
       visionCommand = alignLeft; 
@@ -34,12 +40,21 @@ public class autoAlignmentToReef extends SequentialCommandGroup {
       visionCommand = alignRight; 
     }
 
+    // if(mode == AutoConstants.autoMode){
+    //   adjustmentVariable = 0; 
+    // }else{
+    //   adjustmentVariable = 180; 
+    // }
+
     addCommands(
-      new TurnToAprilTagCommand(drive, vision, false, mode), 
-      visionCommand,
-      new DriveForwardDistance(drive, 0.15, 0.4, false)
+      // new TurnToAprilTagCommand(drive, vision, endCommand, mode), 
+      visionCommand, 
+      new DriveDistanceCmd(drive, 0.18, 0.40, endCommand, 1500), 
+      Commands.waitSeconds(0.5)
     );
 
-    drive.adjustGyroToAngle(vision.getReefAngleForTag(vision.getBestAprilTag(),mode)); 
+
+    drive.adjustGyroToAngle(vision.getReefAngleForTag(vision.getBestAprilTag(), AutoConstants.autoMode)); 
+
   }
 }

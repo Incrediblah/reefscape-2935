@@ -3,7 +3,7 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.subsystems;
-import com.revrobotics.RelativeEncoder;
+//import com.revrobotics.RelativeEncoder;
 import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -42,6 +42,10 @@ public class ArmSubsystem extends SubsystemBase {
     return m_armEncoder.getPosition();
   }
 
+  public double getArmVelocity () {
+    return m_armEncoder.getVelocity();
+  }
+
   // public void resetArmEncoder () {
   //   m_armEncoder.setPosition(0);
   // }
@@ -54,5 +58,6 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Arm: ", m_armEncoder.getPosition());
+    SmartDashboard.putNumber("maxArmVelocity", m_armEncoder.getVelocity());
   }
 }
