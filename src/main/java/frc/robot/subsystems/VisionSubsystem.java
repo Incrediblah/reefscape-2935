@@ -45,6 +45,7 @@ public class VisionSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Last Seen Tag ID", lastSeenTagID); // Display the last seen tag ID
     SmartDashboard.putNumber("best Tag ID", getBestAprilTag()); // Display the last seen tag ID
 
+
     LastSeenTagID();
   }
  
@@ -228,45 +229,134 @@ public class VisionSubsystem extends SubsystemBase {
 
       if(mode == AutoConstants.teleMode){
         switch (tagID) {
-          case 6: return -120;
-          case 7: return -180;
-          case 8: return 120;
-          case 9: return 60;
-          case 10: return 0;
-          case 11: return -60;
-          case 17: return 120;
-          case 18: return -180;
-          case 19: return -120;
-          case 20: return -60;
-          case 21: return 0;
-          case 22: return 60;
-          case 1: return -120; 
-          case 2: return 120; 
+          case 6: return 300;
+          case 7: return 0;
+          case 8: return 60;
+          case 9: return 120;
+          case 10: return 180;
+          case 11: return 240;
+          case 17: return 60;
+          case 18: return 0;
+          case 19: return 300;
+          case 20: return 240;
+          case 21: return 180;
+          case 22: return 120;
+          case 1: return 300; 
+          case 2: return 60; 
           default: return 0; // If no valid tag, assume no turn needed
         }
       }else if(mode == AutoConstants.autoMode){
         switch (tagID) {
-          case 6: return 120;
-          case 7: return 180;
-          case 8: return -120;
-          case 9: return -60;
-          case 10: return 0;
-          case 11: return 60;
-          case 17: return -120;
-          case 18: return 180;
-          case 19: return 120;
-          case 20: return 60;
-          case 21: return 0;
-          case 22: return -60;
-          case 1: return 120; 
-          case 2: return -120; 
-          default: return 0; // If no valid tag, assume no turn needed
+          case 6: return 120;  // 120 → 300
+          case 7: return 180;    // 180 → 0
+          case 8: return -120;   // -120 → 60
+          case 9: return -60;  // -60 → 120
+          case 10: return 0; // 0 → 180
+          case 11: return 60; // 60 → 240
+          case 17: return -120;  // -120 → 60
+          case 18: return 180;   // 180 → 0
+          case 19: return 120; // 120 → 300
+          case 20: return 60; // 60 → 240
+          case 21: return 0; // 0 → 180
+          case 22: return -60; // -60 → 120
+          case 1: return 120;  // 120 → 300
+          case 2: return -120;   // -120 → 60
+          default: return 0; // If no valid tag, assume robot is flipped
         }
       }else{
         return 0; 
       }
 
     }
+
+
+
+
+
+
+
+    /// WORKING WITH SPECIFIC TAGS: 
+    /// 
+   
+  public double getLeftSpecificTagTx(int desiredTagID) {
+    if (!limelightLeftTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] leftTagIDs = m_limelightLeftTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] leftTxValues = m_limelightLeftTable.getEntry("tx").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < leftTagIDs.length; i++) {
+        if ((int) leftTagIDs[i] == desiredTagID) {
+            return leftTxValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
+  public double getRightSpecificTagTx(int desiredTagID) {
+    if (!limelightRightTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] rightTagIDs = m_limelightRightTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] rightTxValues = m_limelightRightTable.getEntry("tx").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < rightTagIDs.length; i++) {
+        if ((int) rightTagIDs[i] == desiredTagID) {
+            return rightTxValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+  public double getLeftSpecificTagTy(int desiredTagID) {
+    if (!limelightLeftTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] leftTagIDs = m_limelightLeftTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] leftTyValues = m_limelightLeftTable.getEntry("ty").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < leftTagIDs.length; i++) {
+        if ((int) leftTagIDs[i] == desiredTagID) {
+            return leftTyValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
+  public double getRightSpecificTagTy(int desiredTagID) {
+    if (!limelightRightTargetSeen()) {
+        return 0.0; // No tag detected
+    }
+
+    // Left Limelight - Loop through tags
+    double[] rightTagIDs = m_limelightRightTable.getEntry("tid").getDoubleArray(new double[0]);
+    double[] rightTyValues = m_limelightRightTable.getEntry("ty").getDoubleArray(new double[0]);
+
+    for (int i = 0; i < rightTagIDs.length; i++) {
+        if ((int) rightTagIDs[i] == desiredTagID) {
+            return rightTyValues[i]; // Return the TX for the matched tag
+        }
+    }
+
+    return 0.0; // Default if tag not found
+  }
+
+
+
   
 }
 

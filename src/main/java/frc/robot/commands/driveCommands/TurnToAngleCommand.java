@@ -2,11 +2,11 @@ package frc.robot.commands.driveCommands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.subsystems.DriveSubsystem;
 
 import frc.robot.subsystems.DriveSubsystem;
+
 
 public class TurnToAngleCommand extends Command {
     private final DriveSubsystem DRIVE_SUBSYSTEM;
@@ -16,7 +16,7 @@ public class TurnToAngleCommand extends Command {
     public TurnToAngleCommand(DriveSubsystem driveSubsystem, double targetAngle) {
         this.DRIVE_SUBSYSTEM = driveSubsystem;
         this.targetAngle = targetAngle;
-        this.turnPID = new PIDController(0.035, 0, 0.001); // Tune values as needed
+        this.turnPID = new PIDController(0.03, 0, 0.001); // Tune values as needed
         turnPID.enableContinuousInput(-180, 180);
         addRequirements(DRIVE_SUBSYSTEM);
     }
@@ -25,7 +25,7 @@ public class TurnToAngleCommand extends Command {
     public void execute() {
         double currentAngle = DRIVE_SUBSYSTEM.getHeading(); // Get gyro heading
         double turnSpeed = turnPID.calculate(currentAngle, targetAngle);
-        turnSpeed = MathUtil.clamp(turnSpeed, -0.4, 0.4); // Limit rotation speed
+        turnSpeed = MathUtil.clamp(turnSpeed, -0.8, 0.8); // Limit rotation speed
         DRIVE_SUBSYSTEM.drive(0, 0, turnSpeed, false); // Apply rotation
     }
 

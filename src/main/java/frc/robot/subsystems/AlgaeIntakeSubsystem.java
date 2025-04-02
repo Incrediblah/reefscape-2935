@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 //import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -13,21 +14,22 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Configs;
-import frc.robot.Constants.CoralIntakeConstants;
+import frc.robot.Constants.AlgaeIntakeConstants;
+import frc.robot.Constants.AlgaeIntakeConstants;
 import frc.robot.Constants.StatusVariables;
 
-public class CoralIntakeSubsystem extends SubsystemBase {
+public class AlgaeIntakeSubsystem extends SubsystemBase {
 
   // Setup coral motor with SparkMax
-  private SparkMax m_CoralIntake = new SparkMax(CoralIntakeConstants.kCoralIntakeCanId, MotorType.kBrushless);
+  private SparkFlex m_AlgaeIntake = new SparkFlex(AlgaeIntakeConstants.kAlgaeIntakeCanId, MotorType.kBrushless);
 
-  private DigitalInput intakeSwitch = new DigitalInput(CoralIntakeConstants.intakeSwitchPort); 
   
-  /** Creates a new CoralIntakeSubsystem. */
-  public CoralIntakeSubsystem() {
+  
+  /** Creates a new AlgaeIntakeSubsystem. */
+  public AlgaeIntakeSubsystem() {
 
-    m_CoralIntake.configure(
-      Configs.CoralIntakeSubsystem.coralIntakeConfig, 
+    m_AlgaeIntake.configure(
+      Configs.AlgaeIntakeSubsystem.algaeIntakeConfig, 
       ResetMode.kResetSafeParameters, 
       PersistMode.kPersistParameters
     );
@@ -36,33 +38,31 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   }
 
   // This commands sets the output power of the motor between 0 and 1
-  public void setCoralIntakeSpeed(double CoralIntakeSpeed) {
-    m_CoralIntake.set(CoralIntakeSpeed);
+  public void setAlgaeIntakeSpeed(double AlgaeIntakeSpeed) {
+    m_AlgaeIntake.set(AlgaeIntakeSpeed);
   }
 
+ 
+
   // This command gets the output current of the Spark while it is running
-  public double getCoralIntakeCurrentDraw() {
-    return m_CoralIntake.getOutputCurrent();
+  public double getAlgaeIntakeCurrentDraw() {
+    return m_AlgaeIntake.getOutputCurrent();
   }
 
 
   // This command stops the intake motors
-  public void stopCoralIntake() {
-    m_CoralIntake.stopMotor();
+  public void stopAlgaeIntake() {
+    m_AlgaeIntake.stopMotor();
   }
 
   
-  public boolean getIntakeSwitchValue(){
-    StatusVariables.hasCoral = intakeSwitch.get();
-    return intakeSwitch.get(); 
-  }
-
+  
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
 
     // Print out the current of the intake to the smartdashboard
-    SmartDashboard.putNumber("Current ", getCoralIntakeCurrentDraw());
-    SmartDashboard.putBoolean("has piece", getIntakeSwitchValue());  
+    SmartDashboard.putNumber("Current ", getAlgaeIntakeCurrentDraw());
+   
   }
 }

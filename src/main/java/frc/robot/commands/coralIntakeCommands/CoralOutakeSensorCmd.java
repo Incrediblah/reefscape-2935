@@ -13,7 +13,6 @@ import frc.robot.subsystems.CoralIntakeSubsystem;
 public class CoralOutakeSensorCmd extends Command {
 
   private final CoralIntakeSubsystem INTAKE_SUBSYSTEM;
-  private boolean gamePieceDetected = true;
   private final Timer timer = new Timer();
 
 
@@ -28,32 +27,31 @@ public class CoralOutakeSensorCmd extends Command {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    gamePieceDetected = false;
     timer.stop();
     timer.reset();
-    INTAKE_SUBSYSTEM.setCoralIntakeSpeed(CoralIntakeConstants.kCoralOutakeSpeed);
+
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (gamePieceDetected && !INTAKE_SUBSYSTEM.getIntakeSwitchValue()) {
-        gamePieceDetected = false;
+    if (!INTAKE_SUBSYSTEM.getIntakeSwitchValue()) {
         timer.start(); // Start the 500ms timer when the sensor is triggered
+        INTAKE_SUBSYSTEM.setCoralIntakeSpeed(CoralIntakeConstants.kCoralSlowOutakeSpeed);
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    INTAKE_SUBSYSTEM  .setCoralIntakeSpeed(0);
+    INTAKE_SUBSYSTEM.setCoralIntakeSpeed(0);
  
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    if(!gamePieceDetected && timer.hasElapsed(0.5)){
+    if(INTAKE_SUBSYSTEM.getIntakeSwitchValue() && timer.hasElapsed(0.50)){
       return true; 
     }else{
       return false; 
