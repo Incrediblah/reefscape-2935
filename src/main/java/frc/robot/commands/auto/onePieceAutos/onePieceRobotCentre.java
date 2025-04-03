@@ -5,8 +5,8 @@
 package frc.robot.commands.auto.onePieceAutos;
 
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-
-
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutoConstants;
@@ -40,17 +40,17 @@ public class onePieceRobotCentre extends SequentialCommandGroup {
 
 
 
-      
-      // new DriveDistanceCmd(drive, 0.45, 1, false), 
+        Commands.waitSeconds(3), 
+       new DriveDistanceCmd(drive, 0.25, 0.15, false, 0),
        new SequentialCommandGroup(
         new MoveArmToSetpoint(arm, ArmConstants.kLevel4), 
         new MoveElevatorToSetpoint(elevator, ElevatorConstants.kLevel4)
         ), 
       new autoScoreCoral(drive, vision, elevator, arm, intake, "right",AutoConstants.autoMode),
 
-      new InstantCommand(() -> drive.zeroHeading()),
+      new InstantCommand(() -> drive.zeroHeading())
 
-      new InstantCommand(() -> drive.adjustGyroToAngle(180))
+      //new InstantCommand(() -> drive.adjustGyroToAngle(180))
 
 
     );

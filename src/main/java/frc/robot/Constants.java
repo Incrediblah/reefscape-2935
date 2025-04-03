@@ -93,14 +93,14 @@ public final class Constants {
     public static final int kElevator2CanId = 51;
 
     public static final double kHome = 0;
-    public static final double kFeederStation = 9; //5//14 //55
+    public static final double kFeederStation = 11; //5//14 //55
     public static final double kTravel = 0;
 
     public static final double kLevel1 = 0;
     public static final double kLevel2 = 0;
      //16
     public static final double kLevel3 = 0; // 5
-    public static final double kLevel4 = 29;//72 //88
+    public static final double kLevel4 = 28;//72 //88
     public static final double kHigh = 25;//72 //88
     public static final double kNet = 30;//72 //88
     public static final double kLevelClimb=2.5;
@@ -124,13 +124,13 @@ public final class Constants {
     public static final double kClimbPosition = 0;
 
     public static final double kLevel1 = 0.4;
-    public static final double kLevel2 = 2.7; //-7
+    public static final double kLevel2 = 2.6; //-7
     public static final double kLevel3 = 3.25;//3.35
     public static final double kLevel4 = 3.1; //84
     public static final double kClimbHigh = 5.1; //84
     public static final double kLevelClimb = 5.1; //84
-    public static final double kNet = 2.8; //84
-    public static final double kAlgaeHigh = 1.8; //84
+    public static final double kNet = 2.6; //84
+    public static final double kAlgaeHigh = 1.55; //84
     public static final double kAlgaeLow = 1; //84
 
 
@@ -141,8 +141,8 @@ public final class Constants {
 
     public static final int kClimbCanId = 57;
 
-    public static final double kclimbUp = 95; 
-    public static final double kclimbOut= 245;
+    public static final double kclimbUp = 96; 
+    public static final double kclimbOut= 254;
     public static final double kclimbReset=-100;
     public static final double kHome=0;
     public static final double climbDownSpeed=-0.2;
@@ -173,11 +173,11 @@ public final class Constants {
   public static class VisionConstants {
 
     // coral alignment points 
-    public static final double leftCamTagX = 12.2;
-    public static final double leftCamTagY = 1.0;
+    public static final double leftCamTagX = 7.08;
+    public static final double leftCamTagY = -0.5;
 
-    public static final double rightCamTagX = -12.8;
-    public static final double rightCamTagY = -0.74;
+    public static final double rightCamTagX = -13.09;
+    public static final double rightCamTagY = -1.06;
 
     // coral tolerances 
     public static final double xTol = 0.5; 
@@ -297,7 +297,7 @@ public final class Constants {
 
     public static final double kAlgaeIntakeSpeed = 1;
     public static final double kAlgaeOutakeSpeed = -1;
-    public static final double kAlgaenoSpeed = 0.25;
+    public static final double kAlgaenoSpeed = 0.05;
 
   }
 }

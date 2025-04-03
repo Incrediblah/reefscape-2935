@@ -168,7 +168,7 @@ public class twoPieceRobotLeft extends SequentialCommandGroup {
 
           new SequentialCommandGroup(
             new TurnToAngleCommand(drive, -126), 
-            new DriveDistanceAtRobotAngleCmd(drive, 0.7, 3.5, 165, false, 10000)
+            new DriveDistanceAtRobotAngleCmd(drive, 0.7, 3.5, 165, false, 5000)
           )
       ), 
 

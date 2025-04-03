@@ -263,7 +263,7 @@ public class alignXandYLeftCamera extends Command {
             } else {
                 strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
             }
-            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.7, 0.7); // Keep existing limits
+            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.5, 0.5); // Keep existing limits
 
             // Y-direction (Forward movement)
             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 

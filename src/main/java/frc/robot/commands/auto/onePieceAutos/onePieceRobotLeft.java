@@ -23,6 +23,7 @@ import frc.robot.commands.coralIntakeCommands.CoralIntakeCmd;
 import frc.robot.commands.coralIntakeCommands.CoralOutakeSensorCmd;
 import frc.robot.commands.driveCommands.DriveDistanceAtRobotAngleCmd;
 import frc.robot.commands.driveCommands.DriveDistanceCmd;
+import frc.robot.commands.driveCommands.TurnToAngleCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.CoralIntakeSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -42,13 +43,14 @@ public class onePieceRobotLeft extends SequentialCommandGroup {
       new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
       new InstantCommand(() -> drive.zeroHeading()),
       new InstantCommand(() -> drive.adjustGyroToAngle(-60)), 
+      // new TurnToAngleCommand(drive, -55), 
 
 
 
      new ParallelDeadlineGroup(
         new SequentialCommandGroup(
-         //new DriveDistanceCmd(drive, 0.80, 1, false, 3000), 
-          new DriveDistanceAtRobotAngleCmd(drive, 0.8, 1.25, 60, false, 5000), 
+        //  new DriveDistanceCmd(drive, 0.55, 1.3, false, 3000), 
+         new DriveDistanceAtRobotAngleCmd(drive, 0.5, 1.15, 10, false, 5000), //speed was 0.8
           new autoAlignmentToReef(drive, vision, "left", false, AutoConstants.autoMode)
         ), 
 

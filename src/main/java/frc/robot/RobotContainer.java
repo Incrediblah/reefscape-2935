@@ -15,6 +15,7 @@ import frc.robot.Constants.DriverControllerConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorControllerConstants;
 import frc.robot.Constants.StatusVariables;
+import frc.robot.Constants.VisionConstants;
 import frc.robot.Constants.pathConstants;
 import frc.robot.Constants.photonVisionConstants;
 import frc.robot.commands.AlgaeIntakeCmd;
@@ -38,6 +39,8 @@ import frc.robot.commands.driveCommands.DriveDistanceAtRobotAngleCmd;
 import frc.robot.commands.driveCommands.DriveDistanceCmd;
 import frc.robot.commands.driveCommands.OdometryCmd;
 import frc.robot.commands.driveCommands.TurnToAngleCommand;
+import frc.robot.commands.limelightCommands.alignXandYLeftCamera;
+import frc.robot.commands.limelightCommands.alignXandYRightCamera;
 import frc.robot.commands.photonCommands.AlignXandYWithPhoton;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.ClimbSubsystem;
@@ -88,8 +91,7 @@ public class RobotContainer {
   private final Command twoPieceLeft = new twoPieceRobotLeft(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem);
   private final Command twoPieceRight = new twoPieceRobotRight(s_driveSubsystem, s_VisionSubsystem, photon, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem);
   SendableChooser<Command> m_autoChooser = new SendableChooser<>(); 
-
-
+  
 
   // Setup Driver Controller
   private final CommandXboxController m_driverController =
@@ -101,6 +103,9 @@ public class RobotContainer {
 
   private final CommandXboxController m_devController = 
       new CommandXboxController(5);
+
+    
+  private double adjustClimbSetpoint = ClimbConstants.kclimbUp;
 
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -115,7 +120,6 @@ public class RobotContainer {
     m_autoChooser.addOption("TWO-PIECE-LEFT", twoPieceLeft);
   
     Shuffleboard.getTab("Autonomous").add(m_autoChooser); 
-
 
 
 
@@ -150,6 +154,7 @@ public class RobotContainer {
 
   private void defaultCommands(){
     SmartDashboard.putNumber("Current Coral", Globals.currentPos);
+    SmartDashboard.putNumber("Climb Adjust", adjustClimbSetpoint);
   }
 
   private void configureBindings() {
@@ -304,23 +309,46 @@ public class RobotContainer {
 
     //GO TO CLIMB OUT again
 
-m_operatorController.povUp().onTrue(
-  new MoveClimbManually(climb, ClimbConstants.climbDownSpeed)
+// m_operatorController.povUp().onTrue(
+//   //new MoveClimbManually(climb, ClimbConstants.climbDownSpeed)
+//    new MoveClimbToSetpoint(climb, adjustClimbsetpoint)
+//    adjustClimbsetpoint += 5
+// );
+
+m_operatorController.povDown().onTrue(
+  new InstantCommand(() -> {
+    adjustClimbSetpoint += 5;
+    new MoveClimbToSetpoint(climb, adjustClimbSetpoint).schedule();;
+  })
 );
 
-m_operatorController.povUp().onFalse(
-  new MoveClimbManually(climb, ClimbConstants.noSpeed)
-);
+
+
+  m_operatorController.povUp().onTrue(
+    new InstantCommand(() -> {
+      adjustClimbSetpoint -= 5;
+      new MoveClimbToSetpoint(climb, adjustClimbSetpoint).schedule();;
+    })
+  );
    //HOME
-    m_operatorController.povDown().onTrue(
+    m_operatorController.povRight().onTrue(
       new MoveClimbManually(climb, ClimbConstants.climbUpSpeed)
 
     );
 
-    m_operatorController.povDown().onFalse(
+    m_operatorController.povRight().onFalse(
       new MoveClimbManually(climb, ClimbConstants.noSpeed)
+    );
 
-      );
+    m_operatorController.povLeft().onTrue(
+      new MoveClimbManually(climb, ClimbConstants.climbDownSpeed)
+
+    );
+
+    m_operatorController.povLeft().onFalse(
+      new MoveClimbManually(climb, ClimbConstants.noSpeed)
+    );
+
 
       m_operatorController.rightStick().onTrue(
        
@@ -379,6 +407,18 @@ m_operatorController.povUp().onFalse(
       //new DriveDistanceAtRobotAngleCmd(s_driveSubsystem, 0.25, 0.5, -25, false, 5000)
       // new TurnToAngleCommand(s_driveSubsystem, 60)
     ); 
+
+    m_devController.povRight().onTrue (
+      //new autoAlignmentToReef(s_driveSubsystem, s_VisionSubsystem, "right", false, AutoConstants.autoMode)
+      new autoScoreCoral(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "right",AutoConstants.autoMode)
+    );
+   
+    m_devController.povLeft().onTrue (
+      // new alignXandYRightCamera(s_driveSubsystem, s_VisionSubsystem, 0, false,  VisionConstants.rightCamTagX, VisionConstants.rightCamTagY, VisionConstants.xTol, VisionConstants.yTol)
+      // .andThen(      new DriveDistanceCmd(s_driveSubsystem, 0.18, 0.40, false, 1500))
+      //new autoAlignmentToReef(s_driveSubsystem, s_VisionSubsystem, "left", false, AutoConstants.autoMode)
+      new autoScoreCoral(s_driveSubsystem, s_VisionSubsystem, s_ElevatorSubsystem, s_ArmSubsystem, s_CoralIntakeSubsystem, "left",AutoConstants.autoMode)
+    );
 
 
 

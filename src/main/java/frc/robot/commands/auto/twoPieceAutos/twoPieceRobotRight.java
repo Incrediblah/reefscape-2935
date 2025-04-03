@@ -180,36 +180,39 @@ public class twoPieceRobotRight extends SequentialCommandGroup {
       new InstantCommand(() -> drive.adjustGyroToAngle(126)), 
 
 
-      new DriveDistanceAtRobotAngleCmd(drive, 0.85, 1.35, 17, false, 5000), 
+      new DriveDistanceAtRobotAngleCmd(drive, 0.85, 1.35,-17, false, 5000), 
       
       new autoScoreCoral(drive, vision, elevator, arm, intake, "right",AutoConstants.autoMode),
 
       new InstantCommand(() -> drive.resetOdometry(drive.getPose())), 
 
-      new ParallelCommandGroup(
-        new moveCoralSystemToPosition(arm, elevator, CoralSystemContants.FEEDER),
-        new OdometryCmd(drive, pathConstants.threePieceRetrieveRobotRight)
-      ),
-      
-       new ParallelDeadlineGroup(
-        new CoralIntakeSensorCmd(intake), 
-        new DriveDistanceCmd(drive, 0.3, -1.5, false, 5000)
-      ),
+      new ParallelDeadlineGroup(
 
-      new InstantCommand(() -> drive.zeroHeading()),
-      new InstantCommand(() -> drive.adjustGyroToAngle(126))
+      new SequentialCommandGroup(
+        new DriveDistanceAtRobotAngleCmd(drive, 0.85, 2.5, -155, false, 5000), 
+
+        new ParallelDeadlineGroup(
+          new CoralIntakeSensorCmd(intake), 
+          new DriveDistanceCmd(drive, 0.3, -1.5, false, 5000)
+        )
+      ), 
+     
+      new moveCoralSystemToPosition(arm, elevator, CoralSystemContants.FEEDER)
+      // new OdometryCmd(drive, pathConstants.threePieceRetrieveRobotLeft)
 
 
+    ), 
+    new InstantCommand(() -> drive.zeroHeading()),
+    new InstantCommand(() -> drive.adjustGyroToAngle(126)),
 
 
-    
-      
-      // new ParallelCommandGroup(
-      //   new moveCoralSystemToPosition(arm, elevator, CoralSystemContants.FEEDER),
-      //   new DriveDistanceCmd(drive, 0.8, -1.5, false, 4000)
-  
-      //  )
+    new ParallelDeadlineGroup(
 
+      new DriveDistanceAtRobotAngleCmd(drive, 0.85, 1.35, 17, false, 5000), 
+      new moveCoralSystemToPosition(arm, elevator, CoralSystemContants.L4)
+    ), 
+
+    new autoScoreCoral(drive, vision, elevator, arm, intake, "left",AutoConstants.autoMode)
 
     );
   }
