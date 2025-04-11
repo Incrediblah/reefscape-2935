@@ -198,10 +198,10 @@ public class Configs {
         static {
 
             algaeIntakeConfig
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(30)
+                .idleMode(IdleMode.kCoast)
+                .smartCurrentLimit(50)
                 .voltageCompensation(12)
-                .inverted(true);
+                .inverted(false);
 
         }
 

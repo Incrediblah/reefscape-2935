@@ -22,6 +22,8 @@ public class CoralIntakeSubsystem extends SubsystemBase {
   private SparkMax m_CoralIntake = new SparkMax(CoralIntakeConstants.kCoralIntakeCanId, MotorType.kBrushless);
 
   private DigitalInput intakeSwitch = new DigitalInput(CoralIntakeConstants.intakeSwitchPort); 
+  private DigitalInput funnelSwitch = new DigitalInput(CoralIntakeConstants.intakeFunnelPort); 
+  
   
   /** Creates a new CoralIntakeSubsystem. */
   public CoralIntakeSubsystem() {
@@ -56,6 +58,10 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     StatusVariables.hasCoral = intakeSwitch.get();
     return intakeSwitch.get(); 
   }
+  public boolean getIntakeFunnelValue(){
+    StatusVariables.funnelhasCoral= funnelSwitch.get();
+    return funnelSwitch.get();
+  }
 
   @Override
   public void periodic() {
@@ -64,5 +70,8 @@ public class CoralIntakeSubsystem extends SubsystemBase {
     // Print out the current of the intake to the smartdashboard
     SmartDashboard.putNumber("Current ", getCoralIntakeCurrentDraw());
     SmartDashboard.putBoolean("has piece", getIntakeSwitchValue());  
+    SmartDashboard.putBoolean("funnel good", StatusVariables.funnelhasCoral);  
+
+    SmartDashboard.putBoolean("funnel active", getIntakeFunnelValue());
   }
 }

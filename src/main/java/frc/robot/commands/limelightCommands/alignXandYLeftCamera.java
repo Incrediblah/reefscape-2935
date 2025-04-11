@@ -196,7 +196,7 @@ public class alignXandYLeftCamera extends Command {
 
     /** Creates a new alignmentCommand. */
     public alignXandYLeftCamera(DriveSubsystem drive, VisionSubsystem vision, int pipeline, boolean end, 
-                                double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
+                                double targetOffsetX, double targetOffsetY, double toleranceX, double toleranceY, double heading) { // NEW: Accepts a locked heading from `TurnToAprilTagCommand`
         this.DRIVE_SUBSYSTEM = drive; 
         this.VISION_SUBSYSTEM = vision; 
 
@@ -213,6 +213,7 @@ public class alignXandYLeftCamera extends Command {
         this.toleranceX = toleranceX; 
         this.toleranceY = toleranceY; 
       
+        this.targetAngle = heading; 
         addRequirements(DRIVE_SUBSYSTEM, VISION_SUBSYSTEM);
     }
 
@@ -225,19 +226,6 @@ public class alignXandYLeftCamera extends Command {
         VISION_SUBSYSTEM.setLeftPipeline(setPipelineNumber);
         inRangeX = false; 
         inRangeY = false; 
-
-        int detectedTag = VISION_SUBSYSTEM.getBestAprilTag(); // Get best detected tag ID
-
-      //   int detectedTag = VISION_SUBSYSTEM.getLeftAprilTagID(); 
-        if (detectedTag != -1) { // Ensure a valid tag was detected
-            validTagDetected = true;
-            targetAngle = VISION_SUBSYSTEM.getReefAngleForTag(detectedTag, AutoConstants.autoMode); // Get pre-defined reef angle
-        } else {
-            validTagDetected = false;
-        }
-     
-        // targetAngle = DRIVE_SUBSYSTEM.getHeading(); 
-
 
         VISION_SUBSYSTEM.setLeftPipeline(0);
         VISION_SUBSYSTEM.setLeftPipeline(0);
@@ -263,7 +251,7 @@ public class alignXandYLeftCamera extends Command {
             } else {
                 strafeSpeed = strafePID.calculate(measuredValueX, targetValueX);
             }
-            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.7, 0.7); // Keep existing limits
+            strafeSpeed = MathUtil.clamp(strafeSpeed, -0.5, 0.5); // Keep existing limits
 
             // Y-direction (Forward movement)
             if (Math.abs(targetValueY - measuredValueY) <= toleranceY) { 
@@ -274,14 +262,9 @@ public class alignXandYLeftCamera extends Command {
             }
             driveSpeed = MathUtil.clamp(driveSpeed, -0.5, 0.5); // Keep existing limits
 
-            // NEW: Lock robot to the set angle and prevent unnecessary rotation
-            double currentHeading = DRIVE_SUBSYSTEM.getHeading();
-            rotationSpeed = rotationPID.calculate(currentHeading, targetAngle);
-            rotationSpeed = MathUtil.clamp(rotationSpeed, -0.4, 0.4); // Small corrections only
-
             SmartDashboard.putNumber("Align Strafe Speed", strafeSpeed); 
             SmartDashboard.putNumber("Align Drive Speed", driveSpeed);
-            SmartDashboard.putNumber("Align Rotation Speed", rotationSpeed); // NEW: Monitor rotation correction
+
             SmartDashboard.putBoolean("In Range X", inRangeX); 
             SmartDashboard.putBoolean("In Range Y", inRangeY);
 
@@ -291,8 +274,17 @@ public class alignXandYLeftCamera extends Command {
         } else {
             driveSpeed *= 0.75;
             strafeSpeed *= 0.75;
-            rotationSpeed *= 0.75;
         }
+
+        
+        // NEW: Lock robot to the set angle and prevent unnecessary rotation
+
+        double currentHeading = DRIVE_SUBSYSTEM.getHeading();
+        rotationSpeed = rotationPID.calculate(currentHeading, targetAngle);
+        rotationSpeed = MathUtil.clamp(rotationSpeed, -0.4, 0.4); // Small corrections only
+        
+        SmartDashboard.putNumber("Align Rotation Speed", rotationSpeed); // NEW: Monitor rotation correction
+
 
         DRIVE_SUBSYSTEM.drive(driveSpeed, strafeSpeed, rotationSpeed, false);
     }
@@ -308,7 +300,7 @@ public class alignXandYLeftCamera extends Command {
     public boolean isFinished() {
         if(endCommand){
             return true; 
-        } else if(inRangeX && inRangeY){
+        } else if(inRangeX && inRangeY &&  Math.abs(targetAngle - DRIVE_SUBSYSTEM.getHeading()) < 2.0){
             return true; 
         } else {
             return false; 

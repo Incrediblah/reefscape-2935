@@ -67,8 +67,8 @@ public class OdometryCmd extends SequentialCommandGroup {
           
         Trajectory retrieveSecondPieceRobotLeft = TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(Math.toRadians(-60))),
-            List.of(new Translation2d(0.18, 1.9)),
-            new Pose2d(0.35, 4.15, new Rotation2d(Math.toRadians(-85))),
+            List.of(new Translation2d(0.18, 2.2)),
+            new Pose2d(0.35, 4.35, new Rotation2d(Math.toRadians(-85))),
             reverseConfig
           );
           

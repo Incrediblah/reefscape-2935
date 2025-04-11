@@ -150,6 +150,9 @@ public class moveCoralSystemToPosition extends SequentialCommandGroup {
     }else if(coralTargetPosition == CoralSystemContants.A2){
       armPosition = ArmConstants.kAlgaeHigh; 
       elevatorPosition = ElevatorConstants.kAlgaeHigh; 
+    }else if (coralTargetPosition==CoralSystemContants.NETBack){
+      armPosition =  ArmConstants.kNetBack ;
+      elevatorPosition = ElevatorConstants.kNet; 
     }
     else{
       armPosition = ArmConstants.kHome; 

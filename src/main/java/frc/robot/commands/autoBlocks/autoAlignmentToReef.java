@@ -28,11 +28,11 @@ public class autoAlignmentToReef extends SequentialCommandGroup {
   // double adjustmentVariable = 0; 
 
   /** Creates a new autoScoreCoral. */
-  public autoAlignmentToReef(DriveSubsystem drive, VisionSubsystem vision, String reefside,boolean endCommand, String mode) {
+  public autoAlignmentToReef(DriveSubsystem drive, VisionSubsystem vision, String reefside,boolean endCommand, String mode, double targetHeading) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
-    Command alignLeft = new alignXandYRightCamera(drive, vision, 0, endCommand, VisionConstants.rightCamTagX, VisionConstants.rightCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
-    Command alignRight = new alignXandYLeftCamera(drive, vision, 0, endCommand, VisionConstants.leftCamTagX, VisionConstants.leftCamTagY, VisionConstants.xTol, VisionConstants.yTol); 
+    Command alignLeft = new alignXandYRightCamera(drive, vision, 0, endCommand, VisionConstants.rightCamTagX, VisionConstants.rightCamTagY, VisionConstants.xTol, VisionConstants.yTol, targetHeading); 
+    Command alignRight = new alignXandYLeftCamera(drive, vision, 0, endCommand, VisionConstants.leftCamTagX, VisionConstants.leftCamTagY, VisionConstants.xTol, VisionConstants.yTol, targetHeading); 
 
     if(reefside == "left"){
       visionCommand = alignLeft; 
@@ -49,7 +49,7 @@ public class autoAlignmentToReef extends SequentialCommandGroup {
     addCommands(
       // new TurnToAprilTagCommand(drive, vision, endCommand, mode), 
       visionCommand, 
-      new DriveDistanceCmd(drive, 0.18, 0.40, endCommand, 1500), 
+      new DriveDistanceCmd(drive, 0.18, 0.45, endCommand, 1500), 
       Commands.waitSeconds(0.5)
     );
 

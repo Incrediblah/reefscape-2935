@@ -99,7 +99,7 @@ import frc.robot.subsystems.VisionSubsystem;
 public class autoScoreCoral extends SequentialCommandGroup {
   
   /** Creates a new autoScoreCoral. */
-  public autoScoreCoral(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside, String mode) {
+  public autoScoreCoral(DriveSubsystem drive, VisionSubsystem vision, ElevatorSubsystem elevator, ArmSubsystem arm, CoralIntakeSubsystem intake, String reefside, String mode, double targetHeading) {
     // Add your commands in the addCommands() call, e.g.
     // addCommands(new FooCommand(), new BarCommand());
 
@@ -110,7 +110,7 @@ public class autoScoreCoral extends SequentialCommandGroup {
 
         new ParallelCommandGroup(
           new moveCoralSystemToPosition(arm, elevator, CoralSystemContants.L4),
-          new autoAlignmentToReef(drive, vision, reefside, false,AutoConstants.autoMode)
+          new autoAlignmentToReef(drive, vision, reefside, false,AutoConstants.autoMode, targetHeading)
         ),
 
        
